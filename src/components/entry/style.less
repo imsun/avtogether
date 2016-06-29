@@ -1,0 +1,26 @@
+@import "../../styles/variables";
+.entry-page {
+  .banner {
+    width: 100%;
+    background: @primary-color;
+    color: #FFF;
+    text-align: center;
+    padding: 100px 0;
+  }
+  .entry-button {
+    margin: 0 10px;
+  }
+  .info-cards {
+    display: flex;
+    width: 80%;
+    max-width: 1000px;
+    margin: 20px auto;
+    & > * {
+      flex: 1;
+      margin: 0 5px;
+      .card-header > div {
+        padding-right: 0 !important;
+      }
+    }
+  }
+}

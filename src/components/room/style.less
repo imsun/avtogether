@@ -1,0 +1,35 @@
+@import "../../styles/variables";
+.room-page {
+  width: 80%;
+  margin: 0 auto;
+  .video-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    input[type=file] {
+      display: none;
+    }
+  }
+  .video-container {
+    display: flex;
+    margin: 20px 0;
+    width: 100%;
+    .video {
+      width: 56vw;
+      video {
+        width: 56vw;
+        height: 31.5vw;
+      }
+    }
+    .sidebar {
+      flex-grow: 1;
+      height: 31.5vw;
+      padding-bottom: 60px;
+      &:after {
+        content: '';
+        margin-top: -60px;
+      }
+    }
+  }
+}
