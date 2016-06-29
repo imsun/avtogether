@@ -10,16 +10,25 @@
   .entry-button {
     margin: 0 10px;
   }
-  .info-cards {
-    display: flex;
+  .content {
     width: 80%;
     max-width: 1000px;
     margin: 20px auto;
-    & > * {
-      flex: 1;
-      margin: 0 5px;
-      .card-header > div {
-        padding-right: 0 !important;
+    .cards {
+      display: flex;
+      margin: 20px auto;
+      .card {
+        flex: 1;
+        margin: 0 5px;
+        padding: 20px 0;
+        text-align: center;
+        .card-desc {
+          margin-top: 20px;
+        }
+        svg {
+          width: 15% !important;
+          height: auto !important;
+        }
       }
     }
   }

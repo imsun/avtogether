@@ -9,12 +9,12 @@ import FlatButton from 'material-ui/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
 import Divider from 'material-ui/Divider'
-import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card'
-import {
-	Step,
-	Stepper,
-	StepLabel,
-} from 'material-ui/Stepper';
+import Paper from 'material-ui/Paper'
+import { Card, CardHeader, CardText } from 'material-ui/Card'
+import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import SwapIcon from 'material-ui/svg-icons/action/swap-vert'
+import SyncIcon from 'material-ui/svg-icons/notification/sync'
+import ForumIcon from 'material-ui/svg-icons/communication/forum'
 import { cyan500 } from 'material-ui/styles/colors'
 
 class Entry extends React.Component{
@@ -94,60 +94,41 @@ class Entry extends React.Component{
 						label="Join a Room"
 					/>
 				</div>
-				<div className="info-cards">
-					<Card>
-						<CardHeader
-							className="card-header"
-							title="P2P Streaming"
-						/>
-						<Divider />
-						<CardText>
-							Videos are peer-to-peer streamed via WebRTC, and no data would be uploaded to server.
-						</CardText>
-					</Card>
-					<Card>
-						<CardHeader
-							className="card-header"
-							title="Progress Syncing"
-						/>
-						<Divider />
-						<CardText>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						</CardText>
-					</Card>
-					<Card>
-						<CardHeader
-							className="card-header"
-							title="Real-time Group Chat"
-						/>
-						<Divider />
-						<CardText>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						</CardText>
-					</Card>
-					<Card>
-						<CardHeader
-							className="card-header"
-							title="Free from Registration"
-						/>
-						<Divider />
-						<CardText>
-							The only thing you need is to set a name.
-						</CardText>
-					</Card>
-				</div>
 
-				<Stepper>
-					<Step active={true}>
-						<StepLabel>Create a room</StepLabel>
-					</Step>
-					<Step active={true}>
-						<StepLabel>Select a local video (won't be uploaded)</StepLabel>
-					</Step>
-					<Step active={true}>
-						<StepLabel>Send room ID or address to your friends</StepLabel>
-					</Step>
-				</Stepper>
+				<div className="content">
+					<Stepper>
+						<Step active={true}>
+							<StepLabel>Create a room</StepLabel>
+						</Step>
+						<Step active={true}>
+							<StepLabel>Select a local video (won't be uploaded)</StepLabel>
+						</Step>
+						<Step active={true}>
+							<StepLabel>Send room ID or address to your friends</StepLabel>
+						</Step>
+					</Stepper>
+
+					<div className="cards">
+						<Paper className="card">
+							<SwapIcon />
+							<div className="card-desc">
+								P2P Streaming
+							</div>
+						</Paper>
+						<Paper className="card">
+							<SyncIcon />
+							<div className="card-desc">
+								Progress Syncing
+							</div>
+						</Paper>
+						<Paper className="card">
+							<ForumIcon />
+							<div className="card-desc">
+								Live Chat
+							</div>
+						</Paper>
+					</div>
+				</div>
 
 				<Dialog
 					title="Join a Room"
