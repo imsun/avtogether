@@ -93,37 +93,44 @@ class Entry extends React.Component{
 					/>
 				</div>
 
-				<div className="content">
-					<Stepper>
-						<Step active={true}>
-							<StepLabel>Create a room</StepLabel>
-						</Step>
-						<Step active={true}>
-							<StepLabel>Select a local video (won't be uploaded)</StepLabel>
-						</Step>
-						<Step active={true}>
-							<StepLabel>Send room ID or address to your friends</StepLabel>
-						</Step>
-					</Stepper>
+				<div className="steps">
+					<div className="content">
+						<h2>EASY TO GO</h2>
+						<div>
+							AvTogether is an experimental project to share local videos with your friends via WebRTC,
+							based on <a href="https://webtorrent.io/">WebTorrent</a>.
+						</div>
+						<Stepper>
+							<Step active={true}>
+								<StepLabel>Create a room</StepLabel>
+							</Step>
+							<Step active={true}>
+								<StepLabel>Select a local video</StepLabel>
+							</Step>
+							<Step active={true}>
+								<StepLabel>Share room to friends</StepLabel>
+							</Step>
+						</Stepper>
+					</div>
+				</div>
 
+				<div className="features">
+					<h2>FEATURES</h2>
 					<div className="cards">
 						<Paper className="card">
 							<SwapIcon />
-							<div className="card-desc">
-								P2P Streaming
-							</div>
+							<div className="card-title">P2P Streaming</div>
+							<div className="card-desc">None of video data would be uploaded</div>
 						</Paper>
 						<Paper className="card">
 							<SyncIcon />
-							<div className="card-desc">
-								Progress Syncing
-							</div>
+							<div className="card-title">Progress Syncing</div>
+							<div className="card-desc">Operation is applied to all when anyone plays / pauses / forwards / backwards the video</div>
 						</Paper>
 						<Paper className="card">
 							<ForumIcon />
-							<div className="card-desc">
-								Live Chat
-							</div>
+							<div className="card-title">Live Chat</div>
+							<div className="card-desc">Comment anytime while watching</div>
 						</Paper>
 					</div>
 				</div>
