@@ -13,17 +13,37 @@
   .content {
     width: 80%;
     max-width: 1000px;
-    margin: 20px auto;
+    margin: 0 auto;
+  }
+  .steps {
+    overflow: auto;
+    text-align: center;
+    background: @color-grey200;
+  }
+  .features {
+    .content;
+    margin: 50px auto;
+    text-align: center;
     .cards {
       display: flex;
-      margin: 20px auto;
+      margin: 20px 0;
       .card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         flex: 1;
         margin: 0 5px;
-        padding: 20px 0;
-        text-align: center;
+        padding: 20px 10px;
+        .card-title {
+          margin: 20px 0;
+        }
         .card-desc {
-          margin-top: 20px;
+          flex-grow: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: @color-lightBlack;
+          font-size: 14px;
         }
         svg {
           width: 15% !important;

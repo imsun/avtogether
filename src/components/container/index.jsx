@@ -66,7 +66,7 @@ class App extends React.Component {
 		return (
 			<div className="container">
 				<AppBar
-					title="AvTogether"
+					title={this.props.location.pathname === '/' ? null : "AvTogether"}
 					titleStyle={{ cursor: 'pointer', flex: '' }}
 					iconStyleLeft={{ display: 'none' }}
 					iconElementRight={iconRight}

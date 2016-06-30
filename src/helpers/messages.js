@@ -20,18 +20,18 @@ messageField('user')(EventMessage)
 realtime.register(EventMessage)
 
 export function init() {
-	return (() => {
+	return new Promise(resolve => {
 		if (_client) {
-			return Promise.resolve(_client)
+			resolve(_client)
 		} else {
-			return realtime.createIMClient(store.getState().user.id)
+			realtime.createIMClient(store.getState().user.id)
 				.then(client => {
 					client.on('message', onMessage)
 					_client = client
-					return Promise.resolve(client)
+					resolve(client)
 				})
 		}
-	})()
+	})
 		.then(client => {
 			const conversationId = store.getState().room.conversationId
 			if (!conversationId) {
@@ -57,7 +57,6 @@ export function init() {
 			_conversation = conversation
 			return Promise.resolve(conversation)
 		})
-
 }
 
 export function quit() {
