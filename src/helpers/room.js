@@ -85,7 +85,7 @@ function addTorrent(torrent) {
 		}
 	})
 		.then(() => updateRemote({ torrents }))
-		.then(() => broadcast(TORRENTS_UPDATE, {torrents}))
+		.then(() => Messages.broadcast(Messages.TORRENTS_UPDATE, {torrents}))
 		.then(() => Promise.resolve(torrent))
 }
 
