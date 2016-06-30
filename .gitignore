@@ -4,4 +4,10 @@
 node_modules
 .idea
 
+<<<<<<< HEAD
 src/config.js
+=======
+dist
+src/config.js
+deploy.sh
+>>>>>>> 04e6ce3f29bb1f35eae933fc5dacf3ff6d9312a1

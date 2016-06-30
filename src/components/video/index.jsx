@@ -70,12 +70,17 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadeddata', () => {
 			console.log('loaded data')
+			let latestTime = this.state.currentTime
 			this.setState({
 				videoReady: true,
 				currentTime: this.target.currentTime,
-				timer: setInterval(() => Room.updateRemote({
-					currentTime: this.target.currentTime
-				}), 2000)
+				timer: setInterval(() => {
+					const currentTime = this.state.currentTime
+					if (currentTime !== latestTime) {
+						latestTime = currentTime
+						Room.updateRemote({ currentTime })
+					}
+				}, 2000)
 			})
 		})
 		target.addEventListener('timeupdate', this.updateProgress)
