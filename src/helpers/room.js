@@ -13,6 +13,8 @@ client.on('error', e => {
 	console.log(e);
 })
 
+const trackers = config.torrent && config.torrent.trackers
+
 export default { create, goto, join, leave, seed, addTorrent, loadTorrent, updateRemote }
 
 function create() {
@@ -61,7 +63,9 @@ function leave() {
 
 function seed(file) {
 	return new Promise(resolve => {
-		client.seed(file, torrent => {
+		client.seed(file, {
+			announce: trackers
+		}, torrent => {
 			resolve(torrent)
 		})
 	})
