@@ -1,7 +1,9 @@
 import './style.less'
 import React, { PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Link, browserHistory } from 'react-router'
+import Room from '../../helpers/room'
 import { userActions } from '../../actions'
 
 import AppBar from 'material-ui/AppBar'
@@ -9,6 +11,11 @@ import FlatButton from 'material-ui/FlatButton'
 import FontIcon from 'material-ui/FontIcon'
 import Dialog from 'material-ui/Dialog'
 import TextField from 'material-ui/TextField'
+import { List, ListItem } from 'material-ui/List'
+import Popover from 'material-ui/Popover'
+import Menu from 'material-ui/Menu'
+import MenuItem from 'material-ui/MenuItem'
+import Divider from 'material-ui/Divider'
 import { GitHubIcon } from '../icon'
 
 function backHome() {
@@ -19,12 +26,35 @@ class App extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			userPopoverOpen: false,
+			userAnchorEl: null,
 			nameDialogErrorText: null,
-			newName: null
+			newName: null,
+			recentlyJoinedDialogOpen: false
 		}
 
-		;['setNewName', 'updateName']
+		;[
+			'openUserPopover', 'closeUserPopover'
+			, 'openNameDialog', 'setNewName', 'updateName'
+			, 'openRecentlyJoinedDialog', 'closeRecentlyJoinedDialog'
+		]
 			.forEach(method => this[method] = this[method].bind(this))
+	}
+	openUserPopover(e) {
+		e.preventDefault()
+		this.setState({
+			userPopoverOpen: true,
+			userAnchorEl: e.currentTarget
+		})
+	}
+	closeUserPopover() {
+		this.setState({
+			userPopoverOpen: false
+		})
+	}
+	openNameDialog() {
+		this.closeUserPopover()
+		this.props.openNameDialog()
 	}
 	setNewName(e) {
 		this.setState({
@@ -35,10 +65,21 @@ class App extends React.Component {
 		this.props.setName(this.state.newName)
 		this.props.closeNameDialog()
 	}
+	openRecentlyJoinedDialog() {
+		this.closeUserPopover()
+		this.setState({
+			recentlyJoinedDialogOpen: true
+		})
+	}
+	closeRecentlyJoinedDialog() {
+		this.setState({
+			recentlyJoinedDialogOpen: false
+		})
+	}
 	render() {
 		const iconRight = (
 			this.props.name
-				? <FlatButton label={this.props.name} onTouchTap={this.props.openNameDialog} />
+				? <FlatButton label={this.props.name} onTouchTap={this.openUserPopover} />
 				: null
 		)
 
@@ -57,9 +98,22 @@ class App extends React.Component {
 				disabled={!this.state.newName || this.state.nameDialogErrorText !== null}
 			/>
 		)
-		const actions = (!this.props.nameRequired || !!this.props.name)
+		const nameDialogActions = (!this.props.nameRequired || !!this.props.name)
 			? [cancelButton, confirmButton]
 			: [confirmButton]
+		const recentlyJoinedDialogActions = [(
+			<FlatButton
+				label="clear"
+				primary={true}
+				onTouchTap={this.props.clearRecentlyJoined}
+			/>
+		),(
+			<FlatButton
+				label="ok"
+				primary={true}
+				onTouchTap={this.closeRecentlyJoinedDialog}
+			/>
+		)]
 		const customContentStyle = {
 			maxWidth: '400px'
 		}
@@ -73,6 +127,19 @@ class App extends React.Component {
 					zDepth={0}
 					onTitleTouchTap={backHome}
 				/>
+				<Popover
+					open={this.state.userPopoverOpen}
+					anchorEl={this.state.userAnchorEl}
+					anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+					targetOrigin={{horizontal: 'right', vertical: 'top'}}
+					onRequestClose={this.closeUserPopover}
+				>
+					<Menu>
+						<MenuItem primaryText="Reset Name" onTouchTap={this.openNameDialog} />
+						<MenuItem primaryText="Recently Joined" onTouchTap={this.openRecentlyJoinedDialog} />
+					</Menu>
+				</Popover>
+
 				{this.props.children}
 
 				<footer>
@@ -85,7 +152,7 @@ class App extends React.Component {
 				</footer>
 				<Dialog
 					title="Set Your Name"
-					actions={actions}
+					actions={nameDialogActions}
 					modal={false}
 					open={this.props.nameDialogOpen}
 					onRequestClose={this.props.closeNameDialog}
@@ -97,22 +164,41 @@ class App extends React.Component {
 						onChange={this.setNewName} />
 					<br />
 				</Dialog>
+				<Dialog
+					title="Recently Joined"
+					actions={recentlyJoinedDialogActions}
+					modal={false}
+					open={this.state.recentlyJoinedDialogOpen}
+					onRequestClose={this.closeRecentlyJoinedDialog}
+					contentStyle={customContentStyle}
+				>
+					<List>
+						<Divider />
+						{
+							this.props.recentlyJoined.map(room => [(
+								<ListItem
+									key={room.roomId}
+									primaryText={room.roomId}
+									secondaryText={room.time}
+									onTouchTap={() => Room.goto(room.roomId)}
+								/>
+							), (
+								<Divider />
+							)])
+						}
+					</List>
+				</Dialog>
 			</div>
 		)
 	}
 }
 
 App.propTypes = {
-	name: PropTypes.string
+	name: PropTypes.string,
+	recentlyJoined: PropTypes.array
 }
 
-const mapDispatchToProps = dispatch => ({
-	setName: name => dispatch(userActions.setName(name)),
-	openNameDialog: () => dispatch(userActions.openNameDialog()),
-	closeNameDialog: () => {
-		dispatch(userActions.closeNameDialog())
-	}
-})
-
-
-export default connect(state => state.user, mapDispatchToProps)(App)
+export default connect(
+	state => state.user,
+	dispatch => bindActionCreators(userActions, dispatch)
+)(App)
