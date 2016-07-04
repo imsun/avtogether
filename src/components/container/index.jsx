@@ -180,7 +180,10 @@ class App extends React.Component {
 									key={room.roomId}
 									primaryText={room.roomId}
 									secondaryText={room.time}
-									onTouchTap={() => Room.goto(room.roomId)}
+									onTouchTap={() => {
+										this.closeRecentlyJoinedDialog()
+										Room.goto(room.roomId)
+									}}
 								/>
 							), (
 								<Divider />

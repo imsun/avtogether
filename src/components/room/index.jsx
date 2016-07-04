@@ -23,6 +23,14 @@ class RoomComponent extends React.Component {
 		;['seed', 'onVideoLoad', 'onVideoStateChange']
 			.forEach(method => this[method] = this[method].bind(this))
 	}
+	componentWillReceiveProps(newProps) {
+		if (this.props.params.id !== newProps.params.id) {
+			this.video.target.src = null
+			this.video.reset()
+			Room.leave()
+				.then(() => Room.join(newProps.params.id))
+		}
+	}
 	componentDidUpdate(prevProps) {
 		if (this.props.torrents.length > 0 &&
 			(prevProps.torrents.length <= 0

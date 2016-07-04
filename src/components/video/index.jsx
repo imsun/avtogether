@@ -25,16 +25,18 @@ function toHHMMSS(secNum, spliter = ':') {
 		: [minutes, seconds].map(time => time < 10 ? `0${time}` : time).join(spliter)
 }
 
+const initState = {
+	duration: 0,
+	currentTime: 0,
+	videoReady: false,
+	textToBeSent: '',
+	timer: null
+}
+
 class Video extends React.Component {
 	constructor(props) {
 		super(props)
-		this.state = {
-			duration: 0,
-			currentTime: 0,
-			videoReady: false,
-			textToBeSent: '',
-			timer: null
-		}
+		this.state = initState
 
 		;['onTextChange', 'send', 'play', 'pause', 'togglePlay', 'seek', 'setProgress', 'updateProgress']
 			.forEach(method => this[method] = this[method].bind(this))
@@ -107,6 +109,12 @@ class Video extends React.Component {
 		if (this.state.timer) {
 			clearInterval(this.state.timer)
 		}
+	}
+	reset() {
+		if (this.state.timer) {
+			clearInterval(this.state.timer)
+		}
+		this.setState(initState)
 	}
 	onTextChange(e, value) {
 		this.setState({
