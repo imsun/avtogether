@@ -14,6 +14,9 @@ import Sidebar from '../sidebar'
 class RoomComponent extends React.Component {
 	constructor(props) {
 		super(props)
+		this.state = {
+			isProcessingVideo: false
+		}
 
 		;['seed', 'onVideoLoad', 'onVideoStateChange']
 			.forEach(method => this[method] = this[method].bind(this))
@@ -47,11 +50,23 @@ class RoomComponent extends React.Component {
 			})
 	}
 	seed(e) {
+		if (e.target.files.length <= 0) return
+		this.setState({
+			isProcessingVideo: true
+		})
 		Room.seed(e.target.files[0])
 			.then(torrent => Room.addTorrent(torrent))
 			.then(torrent => {
 				torrent.files[0].renderTo(this.video.target)
 				this.video.pause(0)
+				this.setState({
+					isProcessingVideo: false
+				})
+			})
+			.catch(e => {
+				this.setState({
+					isProcessingVideo: false
+				})
 			})
 	}
 	onVideoLoad(video) {
@@ -70,27 +85,27 @@ class RoomComponent extends React.Component {
 		return (
 			<div className="room-page">
 				<div className="video-banner">
-					<span>
-						{
-							this.props.torrents[0]
+					{(() => {
+						if (this.state.isProcessingVideo) {
+							return <span>Processing video...</span>
+						} else {
+							return this.props.torrents[0]
 								? <span>Now is playing <b>{this.props.torrents[0].name}</b></span>
-								: 'No video available'
+								: <span>No video available</span>
 						}
-					</span>
-					<span>
-						<RaisedButton
-							className="file-button"
-							label="Choose a Video"
-							labelPosition="before"
-							onTouchTap={() => this.refs.fileInput.click()}
-						/>
-						<input
-							ref="fileInput"
-							type="file"
-							onChange={this.seed}
-							accept="video/mp4,video/x-m4v,video/*"
-						/>
-					</span>
+					})()}
+					<RaisedButton
+						className="file-button"
+						label="Choose a Video"
+						labelPosition="before"
+						onTouchTap={() => this.refs.fileInput.click()}
+					/>
+					<input
+						ref="fileInput"
+						type="file"
+						onChange={this.seed}
+						accept="video/mp4,video/x-m4v,video/*"
+					/>
 				</div>
 				<div className="video-container">
 					<Video onLoad={this.onVideoLoad} onVideoStateChange={this.onVideoStateChange}/>
