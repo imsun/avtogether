@@ -7,7 +7,6 @@ import { userActions } from '../../actions'
 
 import FlatButton from 'material-ui/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton'
-import { Step, Stepper, StepButton } from 'material-ui/Stepper'
 import Video from '../video'
 import Sidebar from '../sidebar'
 
@@ -15,10 +14,6 @@ import Sidebar from '../sidebar'
 class RoomComponent extends React.Component {
 	constructor(props) {
 		super(props)
-
-		this.state = {
-			stepIndex: 0
-		}
 
 		;['seed', 'onVideoLoad', 'onVideoStateChange']
 			.forEach(method => this[method] = this[method].bind(this))
