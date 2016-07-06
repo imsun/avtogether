@@ -5,12 +5,15 @@ import { connect } from 'react-redux'
 import { videoActions } from '../../actions'
 import Room  from '../../helpers/room'
 import { broadcast, CHAT } from '../../helpers/messages'
+import classNames from 'classnames'
 
 import Paper from 'material-ui/Paper'
 import Slider from 'material-ui/Slider'
 import IconButton from 'material-ui/IconButton'
 import AvPlayIcon from 'material-ui/svg-icons/av/play-arrow'
 import AvPauseIcon from 'material-ui/svg-icons/av/pause'
+import FullscreenIcon from 'material-ui/svg-icons/navigation/fullscreen'
+import ExitFullscreenIcon from 'material-ui/svg-icons/navigation/fullscreen-exit'
 import TextField from 'material-ui/TextField'
 
 function toHHMMSS(secNum, spliter = ':') {
@@ -26,12 +29,16 @@ function toHHMMSS(secNum, spliter = ':') {
 		: [minutes, seconds].map(time => time < 10 ? `0${time}` : time).join(spliter)
 }
 
+const isFullScreen = () => !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement)
+const fullScreenChangeEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange']
+
 const initState = {
 	duration: 0,
 	currentTime: 0,
 	videoReady: false,
 	textToBeSent: '',
-	timer: null
+	timer: null,
+	hideVideoControl: false
 }
 
 class Video extends React.Component {
@@ -39,8 +46,18 @@ class Video extends React.Component {
 		super(props)
 		this.state = initState
 
-		;['onTextChange', 'send', 'play', 'pause', 'togglePlay', 'seek', 'setProgress', 'updateProgress']
+		;[
+			'onTextChange', 'send'
+			, 'play', 'pause', 'togglePlay'
+			, 'seek', 'setProgress', 'updateProgress'
+			, 'toggleFullScreen', 'fullScreenChangeListener'
+			, 'showVideoControl', 'flashVideoControl'
+			, 'setHideVideoControlTimer', 'clearHideVideoControlTimer'
+		]
 			.forEach(method => this[method] = this[method].bind(this))
+		fullScreenChangeEvents.forEach(event => {
+			document.addEventListener(event, this.fullScreenChangeListener)
+		})
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.paused !== prevProps.paused) {
@@ -53,6 +70,9 @@ class Video extends React.Component {
 		}
 		if (this.props.currentTime !== prevProps.currentTime) {
 			this.target.currentTime = this.props.currentTime
+		}
+		if (this.props.fullScreen !== prevProps.fullScreen) {
+			this.setHideVideoControlTimer()
 		}
 	}
 	componentDidMount() {
@@ -110,6 +130,9 @@ class Video extends React.Component {
 		if (this.state.timer) {
 			clearInterval(this.state.timer)
 		}
+		fullScreenChangeEvents.forEach(event => {
+			document.removeEventListener(event, this.fullScreenChangeListener)
+		})
 	}
 	reset() {
 		if (this.state.timer) {
@@ -162,6 +185,57 @@ class Video extends React.Component {
 			currentTime: time
 		})
 	}
+	toggleFullScreen() {
+		if (!this.props.fullScreen) {
+			if (this.target.requestFullscreen) this.target.requestFullscreen()
+			else if (this.target.mozRequestFullScreen) this.target.mozRequestFullScreen()
+			else if (this.target.webkitRequestFullScreen) this.target.webkitRequestFullScreen()
+			else if (this.target.msRequestFullscreen) this.target.msRequestFullscreen()
+		} else {
+			if (document.exitFullscreen) document.exitFullscreen()
+			else if (document.mozCancelFullScreen) document.mozCancelFullScreen()
+			else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen()
+			else if (document.msExitFullscreen) document.msExitFullscreen()
+		}
+	}
+	fullScreenChangeListener() {
+		this.props.set({
+			fullScreen: isFullScreen(),
+			hideVideoControl: false
+		})
+	}
+	showVideoControl() {
+		this.clearHideVideoControlTimer()
+		this.setState({
+			hideVideoControl: false
+		})
+	}
+	flashVideoControl() {
+		if (!this.props.fullScreen) {
+			return
+		}
+		this.setHideVideoControlTimer()
+		this.setState({
+			hideVideoControl: false
+		})
+	}
+	setHideVideoControlTimer() {
+		this.clearHideVideoControlTimer()
+		if (this.props.fullScreen) {
+			this.__hideVideoControlTimer = setTimeout(() => {
+				if (this.props.fullScreen) {
+					this.setState({
+						hideVideoControl: true
+					})
+				}
+			}, 1000)
+		}
+	}
+	clearHideVideoControlTimer() {
+		if (this.__hideVideoControlTimer) {
+			clearTimeout(this.__hideVideoControlTimer)
+		}
+	}
 	render() {
 		const smallStyle = {
 			width: 30,
@@ -173,9 +247,19 @@ class Video extends React.Component {
 			height: 30
 		}
 		return (
-			<Paper className="video">
-				<video ref="target" />
-				<div className="control-bar">
+			<Paper className={classNames('video', {
+				'full-screen': this.props.fullScreen,
+				'hide-video-control': this.state.hideVideoControl
+			})}>
+				<video
+					ref="target"
+					onTouchTap={this.flashVideoControl}
+					onMouseMove={this.flashVideoControl}
+				/>
+				<div
+					className="control-bar"
+					onMouseOver={this.showVideoControl}
+				>
 					<IconButton
 						style={smallStyle}
 						iconStyle={iconLarge}
@@ -199,8 +283,22 @@ class Video extends React.Component {
 					<span className="video-time">
 						{toHHMMSS(this.state.currentTime)}/{toHHMMSS(this.state.duration)}
 					</span>
+					<IconButton
+						style={smallStyle}
+						iconStyle={iconLarge}
+						onTouchTap={this.toggleFullScreen}
+					>
+						{
+							this.props.fullScreen
+								? <ExitFullscreenIcon />
+								: <FullscreenIcon />
+						}
+					</IconButton>
 				</div>
-				<div className="text-sender">
+				<div
+					className="text-sender"
+					onmouseover={this.showVideoControl}
+				>
 					<TextField
 						id="inputField"
 						className="input-field"
