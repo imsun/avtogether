@@ -9,8 +9,8 @@ import { broadcast, CHAT } from '../../helpers/messages'
 import Paper from 'material-ui/Paper'
 import Slider from 'material-ui/Slider'
 import IconButton from 'material-ui/IconButton'
-import AvPlay from 'material-ui/svg-icons/av/play-arrow'
-import AvPause from 'material-ui/svg-icons/av/pause'
+import AvPlayIcon from 'material-ui/svg-icons/av/play-arrow'
+import AvPauseIcon from 'material-ui/svg-icons/av/pause'
 import TextField from 'material-ui/TextField'
 
 function toHHMMSS(secNum, spliter = ':') {
@@ -184,8 +184,8 @@ class Video extends React.Component {
 					>
 						{
 							this.props.paused
-								? <AvPlay />
-								: <AvPause />
+								? <AvPlayIcon />
+								: <AvPauseIcon />
 						}
 					</IconButton>
 					<Slider
