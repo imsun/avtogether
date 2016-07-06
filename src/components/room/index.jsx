@@ -1,5 +1,6 @@
 import './style.less'
 import React, { PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Room from '../../helpers/room'
 import { broadcast, VIDEO_UPDATE } from '../../helpers/messages'
@@ -122,8 +123,7 @@ RoomComponent.propTypes = {
 	messages: PropTypes.array.isRequired
 }
 
-const mapDispatchToProps = dispatch => ({
-	setNameRequired: required => dispatch(userActions.setNameRequired(required))
-})
-
-export default connect(state => state.room, mapDispatchToProps)(RoomComponent)
+export default connect(
+	state => state.room,
+	dispatch => bindActionCreators(userActions, dispatch)
+)(RoomComponent)

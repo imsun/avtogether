@@ -1,5 +1,6 @@
 import './style.less'
 import React, { PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { videoActions } from '../../actions'
 import Room  from '../../helpers/room'
@@ -95,8 +96,8 @@ class Video extends React.Component {
 		})
 		target.addEventListener('ended', () => {
 			if (!target.loop) {
-				this.props.setCurrentTime(target.currentTime)
-				this.props.setCurrentTime(0)
+				this.props.seek(target.currentTime)
+				this.props.seek(0)
 				this.props.setPaused(true)
 				this.props.onVideoStateChange && this.props.onVideoStateChange({
 					ended: true
@@ -146,7 +147,7 @@ class Video extends React.Component {
 		this.togglePlay(false, time)
 	}
 	seek(time) {
-		this.props.setCurrentTime(time)
+		this.props.seek(time)
 		this.props.onVideoStateChange && this.props.onVideoStateChange({
 			currentTime: time
 		})
@@ -223,10 +224,7 @@ Video.propTypes = {
 	onVideoStateChange: PropTypes.func
 }
 
-const mapDispatchToProps = dispatch => ({
-	set: state => dispatch(videoActions.set(state)),
-	setCurrentTime: currentTime => dispatch(videoActions.seek(currentTime)),
-	setPaused: paused => dispatch(videoActions.setPaused(paused))
-})
-
-export default connect(state => state.video, mapDispatchToProps)(Video)
+export default connect(
+	state => state.video,
+	dispatch => bindActionCreators(videoActions, dispatch)
+)(Video)
