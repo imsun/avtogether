@@ -29,6 +29,7 @@ function toHHMMSS(secNum, spliter = ':') {
 		: [minutes, seconds].map(time => time < 10 ? `0${time}` : time).join(spliter)
 }
 
+const fullScreenEnabled = !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen)
 const isFullScreen = () => !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement)
 const fullScreenChangeEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange']
 
@@ -55,9 +56,11 @@ class Video extends React.Component {
 			, 'setHideVideoControlTimer', 'clearHideVideoControlTimer'
 		]
 			.forEach(method => this[method] = this[method].bind(this))
-		fullScreenChangeEvents.forEach(event => {
-			document.addEventListener(event, this.fullScreenChangeListener)
-		})
+		if (fullScreenEnabled) {
+			fullScreenChangeEvents.forEach(event => {
+				document.addEventListener(event, this.fullScreenChangeListener)
+			})
+		}
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.paused !== prevProps.paused) {
@@ -130,9 +133,11 @@ class Video extends React.Component {
 		if (this.state.timer) {
 			clearInterval(this.state.timer)
 		}
-		fullScreenChangeEvents.forEach(event => {
-			document.removeEventListener(event, this.fullScreenChangeListener)
-		})
+		if (fullScreenEnabled) {
+			fullScreenChangeEvents.forEach(event => {
+				document.removeEventListener(event, this.fullScreenChangeListener)
+			})
+		}
 	}
 	reset() {
 		if (this.state.timer) {
@@ -283,17 +288,21 @@ class Video extends React.Component {
 					<span className="video-time">
 						{toHHMMSS(this.state.currentTime)}/{toHHMMSS(this.state.duration)}
 					</span>
-					<IconButton
-						style={smallStyle}
-						iconStyle={iconLarge}
-						onTouchTap={this.toggleFullScreen}
-					>
-						{
-							this.props.fullScreen
-								? <ExitFullscreenIcon />
-								: <FullscreenIcon />
-						}
-					</IconButton>
+					{
+						fullScreenEnabled && (
+							<IconButton
+								style={smallStyle}
+								iconStyle={iconLarge}
+								onTouchTap={this.toggleFullScreen}
+							>
+								{
+									this.props.fullScreen
+										? <ExitFullscreenIcon />
+										: <FullscreenIcon />
+								}
+							</IconButton>
+						)
+					}
 				</div>
 				<div
 					className="text-sender"
