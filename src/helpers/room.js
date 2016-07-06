@@ -1,6 +1,6 @@
 import config from '../config'
 import store from '../store'
-import { roomActions, videoActions } from '../actions'
+import { roomActions, userActions, videoActions } from '../actions'
 import * as Messages from './messages'
 import AV from 'leancloud-storage/dist/av'
 import WebTorrent from 'webtorrent/webtorrent.min'
@@ -33,6 +33,7 @@ function join(id) {
 	const rooms = new AV.Query('Room')
 
 	store.dispatch(roomActions.setId(id))
+	store.dispatch(userActions.joinRoom(id))
 	return rooms.get(id)
 		.then(data => {
 			console.log('Room info:', data.attributes)

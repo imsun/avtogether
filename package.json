@@ -13,6 +13,7 @@
   "author": "imsun",
   "license": "MIT",
   "dependencies": {
+    "classnames": "^2.2.5",
     "leancloud-realtime": "^3.0.0-beta.4",
     "leancloud-storage": "^1.2.0",
     "material-ui": "^0.15.1",

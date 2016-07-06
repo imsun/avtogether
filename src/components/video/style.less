@@ -1,32 +1,54 @@
 @import "../../styles/variables";
 .video {
+  position: relative;
   video {
     float: left;
     width: 100%;
     background: @color-grey800;
+    &::-webkit-media-controls {
+      display: none !important;
+    }
   }
   .control-bar {
     display: flex;
+    position: absolute;
+    z-index: 2147483647;
+    left: 0;
+    right: 0;
+    bottom: 30px;
     width: 100%;
     height: 30px;
     align-items: center;
     border-top: 1px solid @color-grey300;
     border-bottom: 1px solid @color-grey300;
+    background: @color-white;
     box-sizing: border-box;
+    & > * {
+      margin: 0 5px;
+    }
     .progress-bar {
       flex-grow: 1;
       & > div {
         margin: 0 !important;
       }
     }
-    .video-time {
-      margin: 0 5px;
-    }
+  }
+  &.full-screen .control-bar {
+    bottom: 0;
+  }
+  &.hide-video-control .control-bar {
+    display: none;
   }
   .text-sender {
     display: flex;
+    position: absolute;
+    z-index: 2147483647;
+    left: 0;
+    right: 0;
+    bottom: 0;
     height: 30px;
     padding: 0 10px;
+    background: @color-white;
     .input-field {
       width: auto !important;
       flex-grow: 1;
@@ -42,6 +64,15 @@
       color: @primary-color;
       line-height: 30px;
       font-size: .8em;
+      &:hover {
+        text-decoration: none;
+      }
     }
+  }
+  &.full-screen .text-sender {
+    bottom: 30px;
+  }
+  &.hide-video-control .text-sender {
+    display: none;
   }
 }

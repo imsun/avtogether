@@ -1,5 +1,6 @@
 import './style.less'
 import React from 'react'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Room from '../../helpers/room'
 import { userActions } from '../../actions'
@@ -154,8 +155,7 @@ class Entry extends React.Component{
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
-	setNameRequired: required => dispatch(userActions.setNameRequired(required))
-})
-
-export default connect(null, mapDispatchToProps)(Entry)
+export default connect(
+	null,
+	dispatch => bindActionCreators(userActions, dispatch)
+)(Entry)

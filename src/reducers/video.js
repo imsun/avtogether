@@ -2,7 +2,8 @@ import { videoActions } from '../actions'
 
 const initState = {
 	paused: true,
-	currentTime: 0
+	currentTime: 0,
+	fullScreen: false
 }
 
 export default function(state = initState, action) {
