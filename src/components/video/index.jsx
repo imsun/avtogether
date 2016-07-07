@@ -375,6 +375,7 @@ class Video extends React.Component {
 									max="1"
 									step="0.1"
 									value={this.props.volume}
+									disabled={this.props.muted}
 									onChange={this.handleVolumeChange}
 								/>
 							</Paper>
