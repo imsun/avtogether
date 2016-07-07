@@ -300,7 +300,7 @@ class Video extends React.Component {
 				/>
 				<div
 					className="text-sender"
-					onmouseover={this.showVideoControl}
+					onMouseOver={this.showVideoControl}
 				>
 					<TextField
 						id="inputField"
