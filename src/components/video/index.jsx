@@ -81,7 +81,12 @@ class Video extends React.Component {
 			this.target.currentTime = this.props.currentTime
 		}
 		if (this.props.fullScreen !== prevProps.fullScreen) {
-			this.setHideVideoControlTimer()
+			if (this.props.fullScreen) {
+				this.setHideVideoControlTimer()
+			} else {
+				this.showVideoControl()
+			}
+
 		}
 		if (this.props.muted !== prevProps.muted) {
 			this.target.muted = this.props.muted
