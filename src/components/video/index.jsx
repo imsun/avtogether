@@ -186,11 +186,10 @@ class Video extends React.Component {
 	pause(time) {
 		this.togglePlay(false, time)
 	}
-	seek(time) {
-		this.props.seek(time)
-		this.props.onVideoStateChange && this.props.onVideoStateChange({
-			currentTime: time
-		})
+	seek(currentTime) {
+		this.setState({ currentTime })
+		this.props.seek(currentTime)
+		this.props.onVideoStateChange && this.props.onVideoStateChange({ currentTime })
 	}
 	togglePlay(start = this.target.paused, time = this.target.currentTime) {
 		this.props.set({
