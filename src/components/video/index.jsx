@@ -41,7 +41,6 @@ const initState = {
 	currentTime: 0,
 	videoReady: false,
 	textToBeSent: '',
-	timer: null,
 	hideVideoControl: false,
 	volumeBarOpen: false
 }
@@ -115,16 +114,16 @@ class Video extends React.Component {
 		target.addEventListener('loadeddata', () => {
 			console.log('loaded data')
 			let latestTime = this.state.currentTime
+			this.updateTimer = setInterval(() => {
+				const currentTime = this.state.currentTime
+				if (currentTime !== latestTime) {
+					latestTime = currentTime
+					Room.updateRemote({ currentTime })
+				}
+			}, 2000)
 			this.setState({
 				videoReady: true,
-				currentTime: this.target.currentTime,
-				timer: setInterval(() => {
-					const currentTime = this.state.currentTime
-					if (currentTime !== latestTime) {
-						latestTime = currentTime
-						Room.updateRemote({ currentTime })
-					}
-				}, 2000)
+				currentTime: this.target.currentTime
 			})
 		})
 		target.addEventListener('timeupdate', this.updateProgress)
@@ -148,8 +147,8 @@ class Video extends React.Component {
 		this.props.onLoad && this.props.onLoad(this)
 	}
 	componentWillUnmount() {
-		if (this.state.timer) {
-			clearInterval(this.state.timer)
+		if (this.updateTimer) {
+			clearInterval(this.updateTimer)
 		}
 		if (fullScreenEnabled) {
 			fullScreenChangeEvents.forEach(event => {
@@ -158,8 +157,9 @@ class Video extends React.Component {
 		}
 	}
 	reset() {
-		if (this.state.timer) {
-			clearInterval(this.state.timer)
+		if (this.updateTimer) {
+			clearInterval(this.updateTimer)
+			this.updateTimer = null
 		}
 		this.setState(initState)
 	}
