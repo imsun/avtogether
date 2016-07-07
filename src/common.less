@@ -25,3 +25,47 @@ code {
   padding: 0 .5em;
   border-radius: 5px;
 }
+
+input[type=range]{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.slider-track {
+  height: 2px;
+  background: @color-grey400;
+  background-clip: content-box;
+  box-sizing: content-box;
+  padding: 8px 0;
+  border: none;
+}
+
+.slider-thumb {
+  -webkit-appearance: none;
+  border: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: @color-cyan500;
+  margin-top: -5px;
+}
+
+input[type=range]::-webkit-slider-runnable-track { .slider-track }
+input[type=range]::-moz-range-track { .slider-track }
+input[type=range]::-ms-track { .slider-track }
+input[type=range]::-ms-fill-lower {
+  background: @color-cyan50;
+}
+
+
+input[type=range]::-webkit-slider-thumb { .slider-thumb }
+input[type=range]::-moz-range-thumb { .slider-thumb }
+input[type=range]::-ms-thumb { .slider-thumb }
+
+input[type=range]:focus {
+  outline: none;
+}
+
+.hidden {
+  display: none !important;
+}
