@@ -97,6 +97,7 @@ class Video extends React.Component {
 	}
 	componentDidMount() {
 		const target = this.target = this.refs.target
+		const fullScreenWrapper = this.fullScreenWrapper = this.refs.fullScreenWrapper
 
 		target.addEventListener('durationchange', () => {
 			console.log('duration change')
@@ -208,10 +209,10 @@ class Video extends React.Component {
 	}
 	toggleFullScreen() {
 		if (!this.props.fullScreen) {
-			if (this.target.requestFullscreen) this.target.requestFullscreen()
-			else if (this.target.mozRequestFullScreen) this.target.mozRequestFullScreen()
-			else if (this.target.webkitRequestFullScreen) this.target.webkitRequestFullScreen()
-			else if (this.target.msRequestFullscreen) this.target.msRequestFullscreen()
+			if (this.fullScreenWrapper.requestFullscreen) this.fullScreenWrapper.requestFullscreen()
+			else if (this.fullScreenWrapper.mozRequestFullScreen) this.fullScreenWrapper.mozRequestFullScreen()
+			else if (this.fullScreenWrapper.webkitRequestFullScreen) this.fullScreenWrapper.webkitRequestFullScreen()
+			else if (this.fullScreenWrapper.msRequestFullscreen) this.fullScreenWrapper.msRequestFullscreen()
 		} else {
 			if (document.exitFullscreen) document.exitFullscreen()
 			else if (document.mozCancelFullScreen) document.mozCancelFullScreen()
@@ -298,100 +299,102 @@ class Video extends React.Component {
 				'full-screen': this.props.fullScreen,
 				'hide-video-control': this.state.hideVideoControl
 			})}>
-				<video
-					ref="target"
-					onTouchTap={this.flashVideoControl}
-					onMouseMove={this.flashVideoControl}
-				/>
-				<div
-					className="text-sender"
-					onMouseOver={this.showVideoControl}
-				>
-					<TextField
-						id="inputField"
-						className="input-field"
-						underlineShow={false}
-						hintText="You can text here"
-						onChange={this.onTextChange}
-						value={this.state.textToBeSent}
-						onKeyDown={e => { if (e.keyCode === 13) this.send() }}
+				<div ref="fullScreenWrapper" className="full-screen-wrapper">
+					<video
+						ref="target"
+						onTouchTap={this.flashVideoControl}
+						onMouseMove={this.flashVideoControl}
 					/>
-					<a className="submit-button" onTouchTap={this.send}>SEND</a>
-				</div>
-				<div
-					className="control-bar"
-					onMouseOver={this.showVideoControl}
-				>
-					<IconButton
-						style={smallStyle}
-						iconStyle={iconLarge}
-						onTouchTap={() => this.togglePlay()}
-						disabled={!this.state.videoReady}
+					<div
+						className="text-sender"
+						onMouseOver={this.showVideoControl}
 					>
-						{
-							this.props.paused
-								? <AvPlayIcon />
-								: <AvPauseIcon />
-						}
-					</IconButton>
-					<Slider
-						className="progress-bar"
-						min={0}
-						max={this.state.duration || 1}
-						value={this.state.duration > this.state.currentTime ? this.state.currentTime : 0}
-						onChange={this.setProgress}
-						disabled={!this.state.videoReady}
-					/>
-					<span className="video-time">
-						{toHHMMSS(this.state.currentTime)}/{toHHMMSS(this.state.duration)}
-					</span>
-					<div>
+						<TextField
+							id="inputField"
+							className="input-field"
+							underlineShow={false}
+							hintText="You can text here"
+							onChange={this.onTextChange}
+							value={this.state.textToBeSent}
+							onKeyDown={e => { if (e.keyCode === 13) this.send() }}
+						/>
+						<a className="submit-button" onTouchTap={this.send}>SEND</a>
+					</div>
+					<div
+						className="control-bar"
+						onMouseOver={this.showVideoControl}
+					>
 						<IconButton
 							style={smallStyle}
-							iconStyle={iconMedium}
-							onTouchTap={this.toggleMuted}
-							onMouseOver={this.openVolumeBar}
-							onMouseLeave={this.closeVolumeBar}
+							iconStyle={iconLarge}
+							onTouchTap={() => this.togglePlay()}
+							disabled={!this.state.videoReady}
 						>
 							{
-								this.props.muted
-									? <VolumeOffIcon />
-									: <VolumeUpIcon />
+								this.props.paused
+									? <AvPlayIcon />
+									: <AvPauseIcon />
 							}
 						</IconButton>
-						<Paper
-							className={classNames('volume-bar', {
-								hidden: !this.state.volumeBarOpen
-							})}
-							onMouseOver={this.openVolumeBar}
-							onMouseLeave={this.closeVolumeBar}
-						>
-							<input
-								className="volume-slider"
-								type="range"
-								min="0"
-								max="1"
-								step="0.1"
-								value={this.props.volume}
-								onChange={this.handleVolumeChange}
-							/>
-						</Paper>
-					</div>
-					{
-						fullScreenEnabled && (
+						<Slider
+							className="progress-bar"
+							min={0}
+							max={this.state.duration || 1}
+							value={this.state.duration > this.state.currentTime ? this.state.currentTime : 0}
+							onChange={this.setProgress}
+							disabled={!this.state.videoReady}
+						/>
+						<span className="video-time">
+							{toHHMMSS(this.state.currentTime)}/{toHHMMSS(this.state.duration)}
+						</span>
+						<div>
 							<IconButton
 								style={smallStyle}
 								iconStyle={iconMedium}
-								onTouchTap={this.toggleFullScreen}
+								onTouchTap={this.toggleMuted}
+								onMouseOver={this.openVolumeBar}
+								onMouseLeave={this.closeVolumeBar}
 							>
 								{
-									this.props.fullScreen
-										? <ExitFullscreenIcon />
-										: <FullscreenIcon />
+									this.props.muted
+										? <VolumeOffIcon />
+										: <VolumeUpIcon />
 								}
 							</IconButton>
-						)
-					}
+							<Paper
+								className={classNames('volume-bar', {
+									hidden: !this.state.volumeBarOpen
+								})}
+								onMouseOver={this.openVolumeBar}
+								onMouseLeave={this.closeVolumeBar}
+							>
+								<input
+									className="volume-slider"
+									type="range"
+									min="0"
+									max="1"
+									step="0.1"
+									value={this.props.volume}
+									onChange={this.handleVolumeChange}
+								/>
+							</Paper>
+						</div>
+						{
+							fullScreenEnabled && (
+								<IconButton
+									style={smallStyle}
+									iconStyle={iconMedium}
+									onTouchTap={this.toggleFullScreen}
+								>
+									{
+										this.props.fullScreen
+											? <ExitFullscreenIcon />
+											: <FullscreenIcon />
+									}
+								</IconButton>
+							)
+						}
+					</div>
 				</div>
 			</Paper>
 		)

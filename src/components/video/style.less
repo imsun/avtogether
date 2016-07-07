@@ -1,13 +1,19 @@
 @import "../../styles/variables";
 .video {
   position: relative;
+  .full-screen-wrapper {
+    width: 100%;
+    height: 100%;
+  }
   video {
     float: left;
     width: 100%;
     background: @color-grey800;
-    &::-webkit-media-controls {
-      display: none !important;
-    }
+  }
+  &.full-screen video {
+    width: 100% !important;
+    height: 100% !important;
+    background: @color-grey900;
   }
   .control-bar {
     display: flex;
@@ -36,7 +42,6 @@
       top: -100px;
       width: 30px;
       height: 100px;
-      z-index: @max-z-index;
       background: @color-white;
       .volume-slider {
         transform: rotate(-90deg);
@@ -53,7 +58,6 @@
   }
   &.full-screen .control-bar {
     bottom: 0;
-    z-index: @max-z-index;
   }
   &.hide-video-control .control-bar {
     display: none;
@@ -89,7 +93,6 @@
   }
   &.full-screen .text-sender {
     bottom: 30px;
-    z-index: @max-z-index;
   }
   &.hide-video-control .text-sender {
     display: none;
