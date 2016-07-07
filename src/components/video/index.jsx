@@ -96,7 +96,7 @@ class Video extends React.Component {
 	}
 	componentDidMount() {
 		const target = this.target = this.refs.target
-		const fullScreenWrapper = this.fullScreenWrapper = this.refs.fullScreenWrapper
+		this.fullScreenWrapper = this.refs.fullScreenWrapper
 
 		target.addEventListener('durationchange', () => {
 			console.log('duration change')
