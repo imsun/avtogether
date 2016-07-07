@@ -12,7 +12,6 @@
   .control-bar {
     display: flex;
     position: absolute;
-    z-index: 2147483647;
     left: 0;
     right: 0;
     bottom: 30px;
@@ -32,9 +31,29 @@
         margin: 0 !important;
       }
     }
+    .volume-bar {
+      position: absolute;
+      top: -100px;
+      width: 30px;
+      height: 100px;
+      z-index: @max-z-index;
+      background: @color-white;
+      .volume-slider {
+        transform: rotate(-90deg);
+        width: 80px;
+        transform-origin: 0px 9px;
+        position: absolute;
+        bottom: 1px;
+        left: 50%;
+        & > div {
+          margin: 0 !important;
+        }
+      }
+    }
   }
   &.full-screen .control-bar {
     bottom: 0;
+    z-index: @max-z-index;
   }
   &.hide-video-control .control-bar {
     display: none;
@@ -42,7 +61,6 @@
   .text-sender {
     display: flex;
     position: absolute;
-    z-index: 2147483647;
     left: 0;
     right: 0;
     bottom: 0;
@@ -71,6 +89,7 @@
   }
   &.full-screen .text-sender {
     bottom: 30px;
+    z-index: @max-z-index;
   }
   &.hide-video-control .text-sender {
     display: none;
