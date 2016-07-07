@@ -9,11 +9,14 @@ import classNames from 'classnames'
 
 import Paper from 'material-ui/Paper'
 import Slider from 'material-ui/Slider'
+import Popover from 'material-ui/Popover'
 import IconButton from 'material-ui/IconButton'
 import AvPlayIcon from 'material-ui/svg-icons/av/play-arrow'
 import AvPauseIcon from 'material-ui/svg-icons/av/pause'
 import FullscreenIcon from 'material-ui/svg-icons/navigation/fullscreen'
 import ExitFullscreenIcon from 'material-ui/svg-icons/navigation/fullscreen-exit'
+import VolumeUpIcon from 'material-ui/svg-icons/av/volume-up'
+import VolumeOffIcon from 'material-ui/svg-icons/av/volume-off'
 import TextField from 'material-ui/TextField'
 
 function toHHMMSS(secNum, spliter = ':') {
@@ -29,6 +32,7 @@ function toHHMMSS(secNum, spliter = ':') {
 		: [minutes, seconds].map(time => time < 10 ? `0${time}` : time).join(spliter)
 }
 
+const fullScreenEnabled = !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen)
 const isFullScreen = () => !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement)
 const fullScreenChangeEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange']
 
@@ -38,7 +42,8 @@ const initState = {
 	videoReady: false,
 	textToBeSent: '',
 	timer: null,
-	hideVideoControl: false
+	hideVideoControl: false,
+	volumeBarOpen: false
 }
 
 class Video extends React.Component {
@@ -53,11 +58,15 @@ class Video extends React.Component {
 			, 'toggleFullScreen', 'fullScreenChangeListener'
 			, 'showVideoControl', 'flashVideoControl'
 			, 'setHideVideoControlTimer', 'clearHideVideoControlTimer'
+			, 'toggleMuted', 'openVolumeBar', 'closeVolumeBar'
+			, 'handleVolumeChange'
 		]
 			.forEach(method => this[method] = this[method].bind(this))
-		fullScreenChangeEvents.forEach(event => {
-			document.addEventListener(event, this.fullScreenChangeListener)
-		})
+		if (fullScreenEnabled) {
+			fullScreenChangeEvents.forEach(event => {
+				document.addEventListener(event, this.fullScreenChangeListener)
+			})
+		}
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.paused !== prevProps.paused) {
@@ -73,6 +82,12 @@ class Video extends React.Component {
 		}
 		if (this.props.fullScreen !== prevProps.fullScreen) {
 			this.setHideVideoControlTimer()
+		}
+		if (this.props.muted !== prevProps.muted) {
+			this.target.muted = this.props.muted
+		}
+		if (this.props.volume !== prevProps.volume) {
+			this.target.volume = this.props.volume
 		}
 	}
 	componentDidMount() {
@@ -130,9 +145,11 @@ class Video extends React.Component {
 		if (this.state.timer) {
 			clearInterval(this.state.timer)
 		}
-		fullScreenChangeEvents.forEach(event => {
-			document.removeEventListener(event, this.fullScreenChangeListener)
-		})
+		if (fullScreenEnabled) {
+			fullScreenChangeEvents.forEach(event => {
+				document.removeEventListener(event, this.fullScreenChangeListener)
+			})
+		}
 	}
 	reset() {
 		if (this.state.timer) {
@@ -169,11 +186,10 @@ class Video extends React.Component {
 	pause(time) {
 		this.togglePlay(false, time)
 	}
-	seek(time) {
-		this.props.seek(time)
-		this.props.onVideoStateChange && this.props.onVideoStateChange({
-			currentTime: time
-		})
+	seek(currentTime) {
+		this.setState({ currentTime })
+		this.props.seek(currentTime)
+		this.props.onVideoStateChange && this.props.onVideoStateChange({ currentTime })
 	}
 	togglePlay(start = this.target.paused, time = this.target.currentTime) {
 		this.props.set({
@@ -236,6 +252,28 @@ class Video extends React.Component {
 			clearTimeout(this.__hideVideoControlTimer)
 		}
 	}
+	toggleMuted() {
+		this.props.set({
+			muted: !this.props.muted
+		})
+	}
+	openVolumeBar() {
+		if (!this.state.volumeBarOpen) {
+			this.setState({
+				volumeBarOpen: true
+			})
+		}
+	}
+	closeVolumeBar() {
+		this.setState({
+			volumeBarOpen: false
+		})
+	}
+	handleVolumeChange(e) {
+		this.props.set({
+			volume: e.target.value
+		})
+	}
 	render() {
 		const smallStyle = {
 			width: 30,
@@ -245,6 +283,10 @@ class Video extends React.Component {
 		const iconLarge = {
 			width: 30,
 			height: 30
+		}
+		const iconMedium = {
+			width: 24,
+			height: 24
 		}
 		return (
 			<Paper className={classNames('video', {
@@ -256,6 +298,21 @@ class Video extends React.Component {
 					onTouchTap={this.flashVideoControl}
 					onMouseMove={this.flashVideoControl}
 				/>
+				<div
+					className="text-sender"
+					onMouseOver={this.showVideoControl}
+				>
+					<TextField
+						id="inputField"
+						className="input-field"
+						underlineShow={false}
+						hintText="You can text here"
+						onChange={this.onTextChange}
+						value={this.state.textToBeSent}
+						onKeyDown={e => { if (e.keyCode === 13) this.send() }}
+					/>
+					<a className="submit-button" onTouchTap={this.send}>SEND</a>
+				</div>
 				<div
 					className="control-bar"
 					onMouseOver={this.showVideoControl}
@@ -283,32 +340,53 @@ class Video extends React.Component {
 					<span className="video-time">
 						{toHHMMSS(this.state.currentTime)}/{toHHMMSS(this.state.duration)}
 					</span>
-					<IconButton
-						style={smallStyle}
-						iconStyle={iconLarge}
-						onTouchTap={this.toggleFullScreen}
-					>
-						{
-							this.props.fullScreen
-								? <ExitFullscreenIcon />
-								: <FullscreenIcon />
-						}
-					</IconButton>
-				</div>
-				<div
-					className="text-sender"
-					onmouseover={this.showVideoControl}
-				>
-					<TextField
-						id="inputField"
-						className="input-field"
-						underlineShow={false}
-						hintText="You can text here"
-						onChange={this.onTextChange}
-						value={this.state.textToBeSent}
-						onKeyDown={e => { if (e.keyCode === 13) this.send() }}
-					/>
-					<a className="submit-button" onTouchTap={this.send}>SEND</a>
+					<div>
+						<IconButton
+							style={smallStyle}
+							iconStyle={iconMedium}
+							onTouchTap={this.toggleMuted}
+							onMouseOver={this.openVolumeBar}
+							onMouseLeave={this.closeVolumeBar}
+						>
+							{
+								this.props.muted
+									? <VolumeOffIcon />
+									: <VolumeUpIcon />
+							}
+						</IconButton>
+						<Paper
+							className={classNames('volume-bar', {
+								hidden: !this.state.volumeBarOpen
+							})}
+							onMouseOver={this.openVolumeBar}
+							onMouseLeave={this.closeVolumeBar}
+						>
+							<input
+								className="volume-slider"
+								type="range"
+								min="0"
+								max="1"
+								step="0.1"
+								value={this.props.volume}
+								onChange={this.handleVolumeChange}
+							/>
+						</Paper>
+					</div>
+					{
+						fullScreenEnabled && (
+							<IconButton
+								style={smallStyle}
+								iconStyle={iconMedium}
+								onTouchTap={this.toggleFullScreen}
+							>
+								{
+									this.props.fullScreen
+										? <ExitFullscreenIcon />
+										: <FullscreenIcon />
+								}
+							</IconButton>
+						)
+					}
 				</div>
 			</Paper>
 		)
