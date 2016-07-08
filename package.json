@@ -16,6 +16,7 @@
     "classnames": "^2.2.5",
     "leancloud-realtime": "^3.0.0-beta.4",
     "leancloud-storage": "^1.2.0",
+    "lodash": "^4.13.1",
     "material-ui": "^0.15.1",
     "react": "^15.0.0",
     "react-dom": "^15.0.0",
