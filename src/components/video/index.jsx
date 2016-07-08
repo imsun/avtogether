@@ -68,7 +68,7 @@ class Video extends React.Component {
 		}
 	}
 	componentDidUpdate(prevProps) {
-		if (this.paused !== prevProps.paused) {
+		if (this.props.paused !== prevProps.paused) {
 			console.log('paused:', this.props.paused)
 			if (this.props.paused) {
 				this.target.pause()
