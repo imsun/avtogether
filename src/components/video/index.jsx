@@ -120,14 +120,15 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadstart', () => {
 			console.log('load start')
-			this.props.pushStatus('loading video information...')
+			this.props.pushStatus('loading video metadata...')
 			target.currentTime = this.props.currentTime
 			this.setState({
 				videoReady: false
 			})
 		})
 		target.addEventListener('loadedmetadata', () => {
-			this.props.pushStatus('video information loaded.')
+			this.props.pushStatus('video metadata loaded.')
+			this.props.pushStatus('loading video data...')
 		})
 		target.addEventListener('waiting', () => {
 			this.props.set({
