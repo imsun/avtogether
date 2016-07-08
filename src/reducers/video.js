@@ -12,7 +12,10 @@ const initState = {
 	volume: parseFloat(localStorage.getItem('videoVolume')),
 	muted: false,
 	statusStack: [],
-	isLoading: false
+	isLoading: false,
+	duration: 0,
+	videoReady: false,
+	realTime: 0
 }
 
 export default function(state = initState, action) {
@@ -39,6 +42,8 @@ export default function(state = initState, action) {
 			return Object.assign({}, state, {
 				statusStack: []
 			})
+		case videoActions.RESET:
+			return Object.assign({}, initState)
 		default:
 			return state
 	}
