@@ -38,9 +38,6 @@ const isFullScreen = () => !!(document.fullScreen || document.webkitIsFullScreen
 const fullScreenChangeEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange']
 
 const initState = {
-	duration: 0,
-	currentTime: 0,
-	videoReady: false,
 	textToBeSent: '',
 	hideVideoControl: false,
 	volumeBarOpen: false
@@ -80,7 +77,7 @@ class Video extends React.Component {
 		}
 		if (this.props.currentTime !== prevProps.currentTime) {
 			this.target.currentTime = this.props.currentTime
-			if (!this.isSeeking && this.state.videoReady) {
+			if (!this.isSeeking && this.props.videoReady) {
 				if (this.target.paused) {
 					// hack to force loading unloaded frames while seeking
 					this.target.play()
@@ -114,7 +111,7 @@ class Video extends React.Component {
 
 		target.addEventListener('durationchange', () => {
 			console.log('duration change')
-			this.setState({
+			this.props.set({
 				duration: target.duration
 			})
 		})
@@ -122,7 +119,7 @@ class Video extends React.Component {
 			console.log('load start')
 			this.props.pushStatus('loading video metadata...')
 			target.currentTime = this.props.currentTime
-			this.setState({
+			this.props.set({
 				videoReady: false
 			})
 		})
@@ -142,17 +139,17 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadeddata', () => {
 			this.props.clearStatus()
-			let latestTime = this.state.currentTime
+			let latestTime = this.props.realTime
 			this.updateTimer = setInterval(() => {
-				const currentTime = this.state.currentTime
+				const currentTime = this.props.realTime
 				if (currentTime !== latestTime) {
 					latestTime = currentTime
 					Room.updateRemote({ currentTime })
 				}
 			}, 2000)
-			this.setState({
+			this.props.set({
 				videoReady: true,
-				currentTime: this.target.currentTime
+				realTime: this.target.currentTime
 			})
 		})
 		target.addEventListener('timeupdate', this.updateProgress)
@@ -205,14 +202,16 @@ class Video extends React.Component {
 		}
 	}
 	handleProgressBarChange(e, currentTime) {
-		this.setState({ currentTime })
+		this.props.set({
+			realTime: currentTime
+		})
 		this.target.currentTime = currentTime
 	}
 	updateProgress() {
-		const duration = this.target.duration || this.state.duration
-		const currentTime = this.target.currentTime
-		if (this.state.videoReady) {
-			this.setState({duration, currentTime})
+		const duration = this.target.duration || this.props.duration
+		const realTime = this.target.currentTime
+		if (this.props.videoReady) {
+			this.props.set({ duration, realTime })
 		}
 	}
 	play(time) {
@@ -364,7 +363,7 @@ class Video extends React.Component {
 							style={smallStyle}
 							iconStyle={iconLarge}
 							onTouchTap={() => this.togglePlay()}
-							disabled={!this.state.videoReady}
+							disabled={!this.props.videoReady}
 						>
 							{
 								this.props.paused
@@ -375,18 +374,18 @@ class Video extends React.Component {
 						<Slider
 							className="progress-bar"
 							min={0}
-							max={this.state.duration || 1}
-							value={this.state.duration > this.state.currentTime ? this.state.currentTime : 0}
+							max={this.props.duration || 1}
+							value={this.props.duration > this.props.realTime ? this.props.realTime : 0}
 							onChange={this.handleProgressBarChange}
-							disabled={!this.state.videoReady}
+							disabled={!this.props.videoReady}
 							onMouseDown={() => this.isSeeking = true}
 							onMouseUp={() => {
 								this.isSeeking = false
-								this.props.seek(this.state.currentTime)
+								this.props.seek(this.props.realTime)
 							}}
 						/>
 						<span className="video-time">
-							{toHHMMSS(this.state.currentTime)}/{toHHMMSS(this.state.duration)}
+							{toHHMMSS(this.props.realTime)}/{toHHMMSS(this.props.duration)}
 						</span>
 						<div>
 							<IconButton
