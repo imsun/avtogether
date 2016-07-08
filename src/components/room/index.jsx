@@ -19,12 +19,11 @@ class RoomComponent extends React.Component {
 			isProcessingVideo: false
 		}
 
-		;['seed', 'onVideoLoad', 'onVideoStateChange']
+		;['seed', 'onVideoLoad']
 			.forEach(method => this[method] = this[method].bind(this))
 	}
 	componentWillReceiveProps(newProps) {
 		if (this.props.params.id !== newProps.params.id) {
-			this.video.target.src = null
 			this.video.reset()
 			Room.leave()
 				.then(() => Room.join(newProps.params.id))
@@ -73,15 +72,6 @@ class RoomComponent extends React.Component {
 	onVideoLoad(video) {
 		this.video = video
 	}
-	onVideoStateChange(state) {
-		if (state.ended) {
-			Room.updateRemote({ currentTime: 0 })
-			Room.updateRemote({ paused: true })
-		} else {
-			Room.updateRemote(state)
-				.then(() => broadcast(VIDEO_UPDATE, state))
-		}
-	}
 	render() {
 		return (
 			<div className="room-page">
@@ -109,7 +99,7 @@ class RoomComponent extends React.Component {
 					/>
 				</div>
 				<div className="video-container">
-					<Video onLoad={this.onVideoLoad} onVideoStateChange={this.onVideoStateChange}/>
+					<Video onLoad={this.onVideoLoad} />
 					<Sidebar />
 				</div>
 			</div>

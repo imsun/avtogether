@@ -3,7 +3,6 @@ import React, { PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { videoActions } from '../../actions'
-import Room  from '../../helpers/room'
 import { broadcast, CHAT } from '../../helpers/messages'
 import classNames from 'classnames'
 
@@ -83,11 +82,6 @@ class Video extends React.Component {
 					this.target.play()
 					this.target.pause()
 				}
-				if (this.props.onVideoStateChange) {
-					this.props.onVideoStateChange({
-						currentTime: this.props.currentTime
-					})
-				}
 			}
 		}
 		if (this.props.fullScreen !== prevProps.fullScreen) {
@@ -139,14 +133,6 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadeddata', () => {
 			this.props.clearStatus()
-			let latestTime = this.props.realTime
-			this.updateTimer = setInterval(() => {
-				const currentTime = this.props.realTime
-				if (currentTime !== latestTime) {
-					latestTime = currentTime
-					Room.updateRemote({ currentTime })
-				}
-			}, 2000)
 			this.props.set({
 				videoReady: true,
 				realTime: this.target.currentTime
@@ -162,11 +148,12 @@ class Video extends React.Component {
 		})
 		target.addEventListener('ended', () => {
 			if (!target.loop) {
-				this.props.seek(target.currentTime)
-				this.props.seek(0)
-				this.props.setPaused(true)
-				this.props.onVideoStateChange && this.props.onVideoStateChange({
-					ended: true
+				this.props.set({
+					currentTime: target.currentTime
+				})
+				this.props.set({
+					currentTime: 0,
+					paused: true
 				})
 			}
 		})
@@ -181,6 +168,7 @@ class Video extends React.Component {
 		}
 	}
 	reset() {
+		this.target.src = null
 		if (this.updateTimer) {
 			clearInterval(this.updateTimer)
 			this.updateTimer = null
@@ -222,10 +210,6 @@ class Video extends React.Component {
 	}
 	togglePlay(start = this.target.paused, time = this.target.currentTime) {
 		this.props.set({
-			paused: !start,
-			currentTime: time
-		})
-		this.props.onVideoStateChange && this.props.onVideoStateChange({
 			paused: !start,
 			currentTime: time
 		})
@@ -445,8 +429,7 @@ class Video extends React.Component {
 Video.propTypes = {
 	paused: PropTypes.bool,
 	currentTime: PropTypes.number,
-	onLoad: PropTypes.func,
-	onVideoStateChange: PropTypes.func
+	onLoad: PropTypes.func
 }
 
 export default connect(

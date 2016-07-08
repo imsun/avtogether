@@ -1,5 +1,5 @@
 import config from '../config'
-import store from '../store'
+import store, { watcher } from '../store'
 import { roomActions, userActions, videoActions } from '../actions'
 import * as Messages from './messages'
 import AV from 'leancloud-storage/dist/av'
@@ -121,4 +121,52 @@ function updateRemote(state) {
 		room.set(key, state[key])
 	})
 	return room.save()
+}
+
+
+/**
+ * Watch video states and update server data
+ */
+watcher.watch(['video', 'videoReady'], videoReadyListener)
+
+let videoUpdateTimer
+function videoReadyListener({ currentValue: videoReady }) {
+	const method = videoReady ? 'watch' : 'off'
+	watcher[method](['video', 'currentTime'], videoListener)
+	watcher[method](['video', 'paused'], videoListener)
+	if (videoReady) {
+		let latestTime = store.getState().video.realTime
+		videoUpdateTimer = setInterval(() => {
+			const currentTime = store.getState().video.realTime
+			if (currentTime !== latestTime) {
+				latestTime = currentTime
+				updateRemote({ currentTime })
+			}
+		}, 2000)
+	} else {
+		clearInterval(videoUpdateTimer)
+		videoUpdateTimer = null
+	}
+}
+
+function videoListener({ cursor, previousState, currentState, currentValue }) {
+	const stateName = cursor[cursor.length - 1]
+	updateRemote({
+		[stateName]: currentValue
+	})
+		.then(() => {
+			// don't broadcast when video ended
+			if (
+				(stateName === 'currentTime' || stateName === 'paused')
+				&& previousState.video.currentTime === previousState.video.duration
+				&& currentState.video.currentTime === 0
+				&& !previousState.video.paused && currentState.video.paused
+				|| currentState.video.currentTime === currentState.video.duration
+			) {
+				return
+			}
+			Messages.broadcast(Messages.VIDEO_UPDATE, {
+				[stateName]: currentValue
+			})
+		})
 }
