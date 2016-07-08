@@ -39,6 +39,9 @@ export default function(state = initState, action) {
 			return Object.assign({}, state, {
 				statusStack: []
 			})
+		case videoActions.RESET:
+			console.log('reset')
+			return Object.assign({}, initState)
 		default:
 			return state
 	}
