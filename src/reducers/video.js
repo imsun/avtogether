@@ -11,7 +11,8 @@ const initState = {
 	mute: false,
 	volume: parseFloat(localStorage.getItem('videoVolume')),
 	muted: false,
-	statusStack: []
+	statusStack: [],
+	isLoading: false
 }
 
 export default function(state = initState, action) {
@@ -22,7 +23,6 @@ export default function(state = initState, action) {
 			}
 			return Object.assign({}, state, action.data)
 		case videoActions.SEEK:
-			console.log('seektime ........', action.currentTime)
 			return Object.assign({}, state, {
 				currentTime: action.currentTime
 			})

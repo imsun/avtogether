@@ -18,6 +18,7 @@ import ExitFullscreenIcon from 'material-ui/svg-icons/navigation/fullscreen-exit
 import VolumeUpIcon from 'material-ui/svg-icons/av/volume-up'
 import VolumeOffIcon from 'material-ui/svg-icons/av/volume-off'
 import TextField from 'material-ui/TextField'
+import CircularProgress from 'material-ui/CircularProgress'
 
 function toHHMMSS(secNum, spliter = ':') {
 	if (isNaN(secNum)) {
@@ -53,7 +54,7 @@ class Video extends React.Component {
 		;[
 			'onTextChange', 'send'
 			, 'play', 'pause', 'togglePlay'
-			, 'seek', 'setProgress', 'updateProgress'
+			, 'handleProgressBarChange', 'updateProgress'
 			, 'toggleFullScreen', 'fullScreenChangeListener'
 			, 'showVideoControl', 'flashVideoControl'
 			, 'setHideVideoControlTimer', 'clearHideVideoControlTimer'
@@ -61,6 +62,7 @@ class Video extends React.Component {
 			, 'handleVolumeChange'
 		]
 			.forEach(method => this[method] = this[method].bind(this))
+		this.isSeeking = false
 		if (fullScreenEnabled) {
 			fullScreenChangeEvents.forEach(event => {
 				document.addEventListener(event, this.fullScreenChangeListener)
@@ -78,6 +80,18 @@ class Video extends React.Component {
 		}
 		if (this.props.currentTime !== prevProps.currentTime) {
 			this.target.currentTime = this.props.currentTime
+			if (!this.isSeeking && this.state.videoReady) {
+				if (this.target.paused) {
+					// hack to force loading unloaded frames while seeking
+					this.target.play()
+					this.target.pause()
+				}
+				if (this.props.onVideoStateChange) {
+					this.props.onVideoStateChange({
+						currentTime: this.props.currentTime
+					})
+				}
+			}
 		}
 		if (this.props.fullScreen !== prevProps.fullScreen) {
 			if (this.props.fullScreen) {
@@ -114,6 +128,16 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadedmetadata', () => {
 			this.props.pushStatus('video information loaded.')
+		})
+		target.addEventListener('waiting', () => {
+			this.props.set({
+				isLoading: true
+			})
+		})
+		target.addEventListener('canplay', () => {
+			this.props.set({
+				isLoading: false
+			})
 		})
 		target.addEventListener('loadeddata', () => {
 			this.props.clearStatus()
@@ -180,8 +204,9 @@ class Video extends React.Component {
 			})
 		}
 	}
-	setProgress(e, value) {
-		this.seek(value)
+	handleProgressBarChange(e, currentTime) {
+		this.setState({ currentTime })
+		this.target.currentTime = currentTime
 	}
 	updateProgress() {
 		const duration = this.target.duration || this.state.duration
@@ -195,11 +220,6 @@ class Video extends React.Component {
 	}
 	pause(time) {
 		this.togglePlay(false, time)
-	}
-	seek(currentTime) {
-		this.setState({ currentTime })
-		this.props.seek(currentTime)
-		this.props.onVideoStateChange && this.props.onVideoStateChange({ currentTime })
 	}
 	togglePlay(start = this.target.paused, time = this.target.currentTime) {
 		this.props.set({
@@ -309,6 +329,11 @@ class Video extends React.Component {
 						onTouchTap={this.flashVideoControl}
 						onMouseMove={this.flashVideoControl}
 					/>
+					<CircularProgress
+						className={classNames('video-loader', {
+							hidden: !this.props.isLoading
+						})}
+					/>
 					<ul className="video-status">
 						{
 							this.props.statusStack.map((status, index) => (
@@ -352,8 +377,13 @@ class Video extends React.Component {
 							min={0}
 							max={this.state.duration || 1}
 							value={this.state.duration > this.state.currentTime ? this.state.currentTime : 0}
-							onChange={this.setProgress}
+							onChange={this.handleProgressBarChange}
 							disabled={!this.state.videoReady}
+							onMouseDown={() => this.isSeeking = true}
+							onMouseUp={() => {
+								this.isSeeking = false
+								this.props.seek(this.state.currentTime)
+							}}
 						/>
 						<span className="video-time">
 							{toHHMMSS(this.state.currentTime)}/{toHHMMSS(this.state.duration)}
