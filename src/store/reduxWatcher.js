@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual'
-import cloneDeep from 'lodash/cloneDeep'
 
 const select = (state, cursor) => cursor.reduce((previous, current) => previous[current], state)
 export default class ReduxWatcher {
