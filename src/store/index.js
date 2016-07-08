@@ -1,5 +1,6 @@
 import { createStore } from 'redux'
 import rootReducer from '../reducers'
+import ReduxWatcher from './reduxWatcher'
 
 const store = createStore(rootReducer)
 
@@ -11,4 +12,5 @@ if (module.hot) {
 	})
 }
 
+export const watcher = new ReduxWatcher(store)
 export default store
