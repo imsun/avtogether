@@ -95,6 +95,7 @@ function addTorrent(torrent) {
 }
 
 function loadTorrent() {
+	store.dispatch(videoActions.pushStatus('finding peers...'))
 	return new Promise(resolve => {
 		client.add(store.getState().room.torrents[0].id, torrent => {
 			console.log('add torrent: ', torrent.name)
@@ -106,6 +107,7 @@ function loadTorrent() {
 			torrent.on('noPeers', (announceType) => {
 				console.log(announceType)
 			})
+			store.dispatch(videoActions.pushStatus('peers found.'))
 			resolve(torrent)
 		})
 	})

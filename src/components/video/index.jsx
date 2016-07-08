@@ -68,7 +68,7 @@ class Video extends React.Component {
 		}
 	}
 	componentDidUpdate(prevProps) {
-		if (this.props.paused !== prevProps.paused) {
+		if (this.paused !== prevProps.paused) {
 			console.log('paused:', this.props.paused)
 			if (this.props.paused) {
 				this.target.pause()
@@ -106,13 +106,17 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadstart', () => {
 			console.log('load start')
+			this.props.pushStatus('loading video information...')
 			target.currentTime = this.props.currentTime
 			this.setState({
 				videoReady: false
 			})
 		})
+		target.addEventListener('loadedmetadata', () => {
+			this.props.pushStatus('video information loaded.')
+		})
 		target.addEventListener('loadeddata', () => {
-			console.log('loaded data')
+			this.props.clearStatus()
 			let latestTime = this.state.currentTime
 			this.updateTimer = setInterval(() => {
 				const currentTime = this.state.currentTime
@@ -305,6 +309,13 @@ class Video extends React.Component {
 						onTouchTap={this.flashVideoControl}
 						onMouseMove={this.flashVideoControl}
 					/>
+					<ul className="video-status">
+						{
+							this.props.statusStack.map((status, index) => (
+								<li key={`status${index}`}>{status}</li>
+							))
+						}
+					</ul>
 					<div
 						className="text-sender"
 						onMouseOver={this.showVideoControl}
