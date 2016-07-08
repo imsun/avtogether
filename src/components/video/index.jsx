@@ -176,9 +176,7 @@ class Video extends React.Component {
 		this.props.onLoad && this.props.onLoad(this)
 	}
 	componentWillUnmount() {
-		if (this.updateTimer) {
-			clearInterval(this.updateTimer)
-		}
+		this.reset()
 		if (fullScreenEnabled) {
 			fullScreenChangeEvents.forEach(event => {
 				document.removeEventListener(event, this.fullScreenChangeListener)
@@ -191,6 +189,7 @@ class Video extends React.Component {
 			this.updateTimer = null
 		}
 		this.setState(initState)
+		this.props.reset()
 	}
 	onTextChange(e, value) {
 		this.setState({
