@@ -34,7 +34,6 @@ export default function(state = initState, action) {
 				paused: action.paused
 			})
 		case videoActions.PUSH_STATUS:
-			console.log(state)
 			return Object.assign({}, state, {
 				statusStack: state.statusStack.concat([action.status])
 			})
