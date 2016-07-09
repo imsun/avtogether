@@ -111,7 +111,9 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadstart', () => {
 			console.log('load start')
-			this.props.pushStatus('loading video metadata...')
+			if (target.getAttribute('src')) {
+				this.props.pushStatus('loading video metadata...')
+			}
 			target.currentTime = this.props.currentTime
 			this.props.set({
 				videoReady: false
@@ -122,9 +124,11 @@ class Video extends React.Component {
 			this.props.pushStatus('loading video data...')
 		})
 		target.addEventListener('waiting', () => {
-			this.props.set({
-				isLoading: true
-			})
+			if (target.getAttribute('src')) {
+				this.props.set({
+					isLoading: true
+				})
+			}
 		})
 		target.addEventListener('canplay', () => {
 			this.props.set({
@@ -168,7 +172,8 @@ class Video extends React.Component {
 		}
 	}
 	reset() {
-		this.target.src = null
+		this.target.src = ''
+		this.target.load()
 		if (this.updateTimer) {
 			clearInterval(this.updateTimer)
 			this.updateTimer = null
