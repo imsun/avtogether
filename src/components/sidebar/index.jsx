@@ -25,6 +25,18 @@ class Sidebar extends React.Component {
 			shareDialogOpen: !this.state.shareDialogOpen
 		})
 	}
+	componentWillUpdate(nextProps) {
+		if (nextProps.messages.length !== this.props.messages.length) {
+			const messageList = this.refs.messageList
+			this.shouldScrollBottom = messageList.scrollTop + messageList.offsetHeight === messageList.scrollHeight
+		}
+	}
+	componentDidUpdate(prevProps) {
+		if (prevProps.messages.length !== this.props.messages.length && this.shouldScrollBottom) {
+			const messageList = this.refs.messageList
+			messageList.scrollTop = messageList.scrollHeight
+		}
+	}
 	render() {
 		return (
 			<Paper className="sidebar">
@@ -36,7 +48,7 @@ class Sidebar extends React.Component {
 					/>
 				</span>
 				<Divider />
-				<ul className="messages">
+				<ul ref="messageList" className="messages">
 					{this.props.messages.map((message, index) => {
 						return (
 							<li key={index}>

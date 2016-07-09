@@ -21,20 +21,15 @@ const initState = {
 export default function(state = initState, action) {
 	switch (action.type) {
 		case videoActions.SET:
-			if (!isNaN(parseFloat(action.data.volume))) {
-				localStorage.setItem('videoVolume', action.data.volume)
+			const data = Object.assign({}, action.data)
+			if (!isNaN(parseFloat(data.volume))) {
+				localStorage.setItem('videoVolume', data.volume)
 			}
-			return Object.assign({}, state, action.data)
-		case videoActions.SEEK:
-			return Object.assign({}, state, {
-				currentTime: action.currentTime
-			})
-		case videoActions.SET_PAUSED:
-			return Object.assign({}, state, {
-				paused: action.paused
-			})
+			if (data.currentTime !== undefined) {
+				data.realTime = data.currentTime
+			}
+			return Object.assign({}, state, data)
 		case videoActions.PUSH_STATUS:
-			console.log(state)
 			return Object.assign({}, state, {
 				statusStack: state.statusStack.concat([action.status])
 			})

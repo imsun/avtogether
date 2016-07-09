@@ -50,7 +50,7 @@ class Video extends React.Component {
 		;[
 			'onTextChange', 'send'
 			, 'play', 'pause', 'togglePlay'
-			, 'handleProgressBarChange', 'updateProgress'
+			, 'handleProgressBarChange', 'updateProgress', 'handleDocumentMouseUp'
 			, 'toggleFullScreen', 'fullScreenChangeListener'
 			, 'showVideoControl', 'flashVideoControl'
 			, 'setHideVideoControlTimer', 'clearHideVideoControlTimer'
@@ -64,6 +64,8 @@ class Video extends React.Component {
 				document.addEventListener(event, this.fullScreenChangeListener)
 			})
 		}
+		document.addEventListener('mouseup', this.handleDocumentMouseUp)
+		window.video = this.props
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.paused !== prevProps.paused) {
@@ -111,7 +113,11 @@ class Video extends React.Component {
 		})
 		target.addEventListener('loadstart', () => {
 			console.log('load start')
-			this.props.pushStatus('loading video metadata...')
+			if (target.getAttribute('src')) {
+				this.props.pushStatus('loading video metadata...')
+				// hack for firefox
+				this.target.pause()
+			}
 			target.currentTime = this.props.currentTime
 			this.props.set({
 				videoReady: false
@@ -122,9 +128,11 @@ class Video extends React.Component {
 			this.props.pushStatus('loading video data...')
 		})
 		target.addEventListener('waiting', () => {
-			this.props.set({
-				isLoading: true
-			})
+			if (target.getAttribute('src')) {
+				this.props.set({
+					isLoading: true
+				})
+			}
 		})
 		target.addEventListener('canplay', () => {
 			this.props.set({
@@ -168,7 +176,8 @@ class Video extends React.Component {
 		}
 	}
 	reset() {
-		this.target.src = null
+		this.target.src = ''
+		this.target.load()
 		if (this.updateTimer) {
 			clearInterval(this.updateTimer)
 			this.updateTimer = null
@@ -202,17 +211,25 @@ class Video extends React.Component {
 			this.props.set({ duration, realTime })
 		}
 	}
+	handleDocumentMouseUp() {
+		if (this.isSeeking) {
+			this.isSeeking = false
+			this.props.set({
+				currentTime: this.props.realTime
+			})
+		}
+	}
 	play(time) {
 		this.togglePlay(true, time)
 	}
 	pause(time) {
 		this.togglePlay(false, time)
 	}
-	togglePlay(start = this.target.paused, time = this.target.currentTime) {
-		this.props.set({
-			paused: !start,
-			currentTime: time
-		})
+	togglePlay(start = this.target.paused, currentTime) {
+		this.props.set({ paused: !start })
+		if (currentTime !== undefined) {
+			this.props.set({ currentTime })
+		}
 	}
 	toggleFullScreen() {
 		if (!this.props.fullScreen) {
@@ -363,10 +380,6 @@ class Video extends React.Component {
 							onChange={this.handleProgressBarChange}
 							disabled={!this.props.videoReady}
 							onMouseDown={() => this.isSeeking = true}
-							onMouseUp={() => {
-								this.isSeeking = false
-								this.props.seek(this.props.realTime)
-							}}
 						/>
 						<span className="video-time">
 							{toHHMMSS(this.props.realTime)}/{toHHMMSS(this.props.duration)}
