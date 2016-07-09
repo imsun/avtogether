@@ -65,6 +65,7 @@ class Video extends React.Component {
 			})
 		}
 		document.addEventListener('mouseup', this.handleDocumentMouseUp)
+		window.video = this.props
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.paused !== prevProps.paused) {
@@ -144,13 +145,15 @@ class Video extends React.Component {
 				videoReady: true,
 				realTime: this.target.currentTime
 			})
+		})
+		target.addEventListener('timeupdate', this.updateProgress)
+		target.addEventListener('play', () => {
 			if (this.props.paused) {
 				target.pause()
 			} else {
 				target.play()
 			}
 		})
-		target.addEventListener('timeupdate', this.updateProgress)
 		target.addEventListener('ended', () => {
 			if (!target.loop) {
 				this.props.set({
@@ -211,7 +214,9 @@ class Video extends React.Component {
 	handleDocumentMouseUp() {
 		if (this.isSeeking) {
 			this.isSeeking = false
-			this.props.seek(this.props.realTime)
+			this.props.set({
+				currentTime: this.props.realTime
+			})
 		}
 	}
 	play(time) {
@@ -220,11 +225,11 @@ class Video extends React.Component {
 	pause(time) {
 		this.togglePlay(false, time)
 	}
-	togglePlay(start = this.target.paused, time = this.target.currentTime) {
-		this.props.set({
-			paused: !start,
-			currentTime: time
-		})
+	togglePlay(start = this.target.paused, currentTime) {
+		this.props.set({ paused: !start })
+		if (currentTime !== undefined) {
+			this.props.set({ currentTime })
+		}
 	}
 	toggleFullScreen() {
 		if (!this.props.fullScreen) {
