@@ -50,7 +50,7 @@ class Video extends React.Component {
 		;[
 			'onTextChange', 'send'
 			, 'play', 'pause', 'togglePlay'
-			, 'handleProgressBarChange', 'updateProgress'
+			, 'handleProgressBarChange', 'updateProgress', 'handleDocumentMouseUp'
 			, 'toggleFullScreen', 'fullScreenChangeListener'
 			, 'showVideoControl', 'flashVideoControl'
 			, 'setHideVideoControlTimer', 'clearHideVideoControlTimer'
@@ -64,6 +64,7 @@ class Video extends React.Component {
 				document.addEventListener(event, this.fullScreenChangeListener)
 			})
 		}
+		document.addEventListener('mouseup', this.handleDocumentMouseUp)
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.paused !== prevProps.paused) {
@@ -113,6 +114,8 @@ class Video extends React.Component {
 			console.log('load start')
 			if (target.getAttribute('src')) {
 				this.props.pushStatus('loading video metadata...')
+				// hack for firefox
+				this.target.pause()
 			}
 			target.currentTime = this.props.currentTime
 			this.props.set({
@@ -141,15 +144,13 @@ class Video extends React.Component {
 				videoReady: true,
 				realTime: this.target.currentTime
 			})
-		})
-		target.addEventListener('timeupdate', this.updateProgress)
-		target.addEventListener('play', () => {
 			if (this.props.paused) {
 				target.pause()
 			} else {
 				target.play()
 			}
 		})
+		target.addEventListener('timeupdate', this.updateProgress)
 		target.addEventListener('ended', () => {
 			if (!target.loop) {
 				this.props.set({
@@ -205,6 +206,12 @@ class Video extends React.Component {
 		const realTime = this.target.currentTime
 		if (this.props.videoReady) {
 			this.props.set({ duration, realTime })
+		}
+	}
+	handleDocumentMouseUp() {
+		if (this.isSeeking) {
+			this.isSeeking = false
+			this.props.seek(this.props.realTime)
 		}
 	}
 	play(time) {
@@ -368,10 +375,6 @@ class Video extends React.Component {
 							onChange={this.handleProgressBarChange}
 							disabled={!this.props.videoReady}
 							onMouseDown={() => this.isSeeking = true}
-							onMouseUp={() => {
-								this.isSeeking = false
-								this.props.seek(this.props.realTime)
-							}}
 						/>
 						<span className="video-time">
 							{toHHMMSS(this.props.realTime)}/{toHHMMSS(this.props.duration)}
