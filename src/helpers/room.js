@@ -149,8 +149,8 @@ function videoReadyListener({ currentValue: videoReady }) {
 	}
 }
 
-function videoListener({ cursor, currentState, currentValue }) {
-	const stateName = cursor[cursor.length - 1]
+function videoListener({ selector, currentState, currentValue }) {
+	const stateName = selector[selector.length - 1]
 	updateRemote({
 		[stateName]: currentValue
 	})

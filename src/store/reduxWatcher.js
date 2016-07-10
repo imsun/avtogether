@@ -1,59 +1,58 @@
 import isEqual from 'lodash/isEqual'
 
-const select = (state, cursor) => cursor.reduce((previous, current) => previous[current], state)
+const select = (state, selector) => selector.reduce((prev, current) => prev[current], state)
 export default class ReduxWatcher {
 	constructor(store) {
 		const watchList = this.__watchList = {}
-		this.__store = store
-		this.__previousState = store.getState()
+		this.__prevState = store.getState()
 		store.subscribe(() => {
-			const currentState = this.__currentState = store.getState()
-			const previousState = this.__previousState
+			const currentState = store.getState()
+			const prevState = this.__prevState
 			Object.keys(watchList).forEach(key => {
 				const listeners = watchList[key]
 				if (!listeners) {
 					return
 				}
-				const cursor = JSON.parse(key)
-				const previousValue = select(previousState, cursor)
-				const currentValue = select(currentState, cursor)
+				const selector = JSON.parse(key)
+				const prevValue = select(prevState, selector)
+				const currentValue = select(currentState, selector)
 
-				if (!isEqual(previousValue, currentValue)) {
+				if (!isEqual(prevValue, currentValue)) {
 					listeners.forEach(listener => listener({
 						store,
-						cursor,
-						previousState,
+						selector,
+						prevState,
 						currentState,
-						previousValue,
+						prevValue,
 						currentValue
 					}))
 				}
 			})
-			this.__previousState = currentState
+			this.__prevState = currentState
 		})
 		this.watch = this.watch.bind(this)
 	}
-	watch(cursor, listener) {
+	watch(selector, listener) {
 		const watchList = this.__watchList
-		const cursorStr = JSON.stringify(cursor)
-		watchList[cursorStr] = watchList[cursorStr] || []
-		watchList[cursorStr].push(listener)
+		const selectorStr = JSON.stringify(selector)
+		watchList[selectorStr] = watchList[selectorStr] || []
+		watchList[selectorStr].push(listener)
 	}
-	off(cursor, listener) {
-		const cursorStr = JSON.stringify(cursor)
-		if (!this.__watchList[cursorStr]) {
-			console.warn(`No such listener for ${cursor}`)
+	off(selector, listener) {
+		const selectorStr = JSON.stringify(selector)
+		if (!this.__watchList[selectorStr]) {
+			console.warn(`No such listener for ${selector}`)
 			return
 		}
-		const listeners = this.__watchList[cursorStr]
+		const listeners = this.__watchList[selectorStr]
 		const listenerIndex = listeners.indexOf(listener)
 		if (listenerIndex >= 0) {
 			listeners.splice(listeners.indexOf(listener))
 		} else {
-			console.warn(`No such listener for ${cursor}`)
+			console.warn(`No such listener for ${selector}`)
 		}
 		if (listeners.length === 0) {
-			delete this.__watchList[cursorStr]
+			delete this.__watchList[selectorStr]
 		}
 	}
 }
