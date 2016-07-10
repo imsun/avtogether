@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/imsun/AvTogether"
   },
-  "author": "imsun",
+  "author": "Shiquan Sun",
   "license": "MIT",
   "dependencies": {
     "classnames": "^2.2.5",
