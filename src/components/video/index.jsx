@@ -156,10 +156,10 @@ class Video extends React.Component {
 		})
 		target.addEventListener('ended', () => {
 			if (!target.loop) {
-				this.props.set({
+				this.props.setWithoutBroadcast({
 					currentTime: target.currentTime
 				})
-				this.props.set({
+				this.props.setWithoutBroadcast({
 					currentTime: 0,
 					paused: true
 				})

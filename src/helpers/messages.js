@@ -86,7 +86,7 @@ function onMessage(message) {
 	switch(message.event) {
 		case VIDEO_UPDATE:
 			if (user.id !== store.getState().user.id) {
-				store.dispatch(videoActions.set(data))
+				store.dispatch(videoActions.setWithoutBroadcast(data))
 			}
 			break
 		case TORRENTS_UPDATE:

@@ -10,13 +10,12 @@
     "type": "git",
     "url": "https://github.com/imsun/AvTogether"
   },
-  "author": "imsun",
+  "author": "Shiquan Sun",
   "license": "MIT",
   "dependencies": {
     "classnames": "^2.2.5",
     "leancloud-realtime": "^3.0.0-beta.4",
     "leancloud-storage": "^1.2.0",
-    "lodash": "^4.13.1",
     "material-ui": "^0.15.1",
     "react": "^15.0.0",
     "react-dom": "^15.0.0",
@@ -24,6 +23,7 @@
     "react-router": "^2.4.1",
     "react-tap-event-plugin": "^1.0.0",
     "redux": "^3.5.2",
+    "redux-watcher": "0.0.2",
     "webtorrent": "^0.95.0"
   },
   "devDependencies": {

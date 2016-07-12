@@ -1,6 +1,6 @@
 import { createStore } from 'redux'
 import rootReducer from '../reducers'
-import ReduxWatcher from './reduxWatcher'
+import ReduxWatcher from 'redux-watcher'
 
 const store = createStore(rootReducer)
 

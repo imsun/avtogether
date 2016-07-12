@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Room from '../../helpers/room'
 import { userActions } from '../../actions'
 
+import { LogoIcon } from '../icon'
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton'
@@ -78,6 +79,7 @@ class Entry extends React.Component{
 		return (
 			<div className="entry-page">
 				<div className="banner">
+					<LogoIcon className="logo" />
 					<h1>AvTogether</h1>
 					<p>Enjoy videos together with your friends.</p>
 					<RaisedButton

@@ -76,15 +76,17 @@ class RoomComponent extends React.Component {
 		return (
 			<div className="room-page">
 				<div className="video-banner">
+					<span className="video-desc">
 					{(() => {
 						if (this.state.isProcessingVideo) {
-							return <span>Processing video...</span>
+							return 'Processing video...'
 						} else {
 							return this.props.torrents[0]
 								? <span>Now is playing <b>{this.props.torrents[0].name}</b></span>
-								: <span>No video available</span>
+								: 'No video available'
 						}
 					})()}
+					</span>
 					<RaisedButton
 						className="file-button"
 						label="Choose a Video"

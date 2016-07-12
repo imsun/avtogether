@@ -149,24 +149,16 @@ function videoReadyListener({ currentValue: videoReady }) {
 	}
 }
 
-function videoListener({ cursor, previousState, currentState, currentValue }) {
-	const stateName = cursor[cursor.length - 1]
+function videoListener({ selector, currentState, currentValue }) {
+	const stateName = selector[selector.length - 1]
 	updateRemote({
 		[stateName]: currentValue
 	})
 		.then(() => {
-			// don't broadcast when video ended
-			if (
-				(stateName === 'currentTime' || stateName === 'paused')
-				&& previousState.video.currentTime === previousState.video.duration
-				&& currentState.video.currentTime === 0
-				&& !previousState.video.paused && currentState.video.paused
-				|| currentState.video.currentTime === currentState.video.duration
-			) {
-				return
+			if (!currentState.video.disableBroadcast) {
+				Messages.broadcast(Messages.VIDEO_UPDATE, {
+					[stateName]: currentValue
+				})
 			}
-			Messages.broadcast(Messages.VIDEO_UPDATE, {
-				[stateName]: currentValue
-			})
 		})
 }
