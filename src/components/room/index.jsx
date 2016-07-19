@@ -44,6 +44,7 @@ class RoomComponent extends React.Component {
 		Room.leave()
 	}
 	load() {
+		this.video.reset()
 		return Room.loadTorrent()
 			.then(torrent => {
 				torrent.files[0].renderTo(this.video.target)

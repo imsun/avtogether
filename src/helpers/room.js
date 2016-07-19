@@ -15,7 +15,7 @@ client.on('error', e => {
 
 const trackers = config.torrent && config.torrent.trackers
 
-export default { create, goto, join, leave, seed, addTorrent, loadTorrent, updateRemote }
+export default { create, goto, join, leave, clearTorrent, seed, addTorrent, loadTorrent, updateRemote }
 
 function create() {
 	const RoomObject = AV.Object.extend('Room')
@@ -49,6 +49,12 @@ function join(id) {
 }
 
 function leave() {
+	return clearTorrent()
+		.then(() => Messages.broadcast(Messages.LEAVE_ROOM))
+		.then(() => Messages.quit())
+}
+
+function clearTorrent() {
 	return new Promise(resolve => {
 		const torrents = store.getState().room.torrents
 		if (torrents.length > 0) {
@@ -58,43 +64,35 @@ function leave() {
 			resolve()
 		}
 	})
-		.then(() => Messages.broadcast(Messages.LEAVE_ROOM))
-		.then(() => Messages.quit())
 }
 
 function seed(file) {
-	return new Promise(resolve => {
-		client.seed(file, {
-			announce: trackers
-		}, torrent => {
-			resolve(torrent)
+	return clearTorrent()
+		.then(() => {
+			return new Promise(resolve => {
+				client.seed(file, {
+					announce: trackers
+				}, torrent => {
+					resolve(torrent)
+				})
+			})
 		})
-	})
 }
 
 function addTorrent(torrent) {
-	const prevTorrent = store.getState().room.torrents[0]
-	store.dispatch(roomActions.setTorrents([{
-		name: torrent.name,
-		id: torrent.magnetURI
-	}]))
 	const torrents = [{
 		name: torrent.name,
 		id: torrent.magnetURI
 	}]
-	return new Promise(resolve => {
-		if (prevTorrent) {
-			client.remove(prevTorrent.id, () => resolve())
-		} else {
-			resolve()
-		}
-	})
+	return clearTorrent()
+		.then(() => store.dispatch(roomActions.setTorrents(torrents)))
 		.then(() => updateRemote({ torrents }))
 		.then(() => Messages.broadcast(Messages.TORRENTS_UPDATE, {torrents}))
 		.then(() => Promise.resolve(torrent))
 }
 
 function loadTorrent() {
+	store.dispatch(videoActions.clearStatus())
 	store.dispatch(videoActions.pushStatus('finding peers...'))
 	return new Promise(resolve => {
 		client.add(store.getState().room.torrents[0].id, torrent => {
