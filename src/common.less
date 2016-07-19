@@ -55,9 +55,12 @@ input[type=range]{
 
 input[type=range]::-webkit-slider-runnable-track { .slider-track }
 input[type=range]::-moz-range-track { .slider-track }
-input[type=range]::-ms-track { .slider-track }
+input[type=range]::-ms-track {
+  .slider-track;
+  margin-top: -4px;
+}
 input[type=range]::-ms-fill-lower {
-  background: @color-cyan50;
+  background: @color-cyan500;
 }
 input[type=range]:disabled::-ms-fill-lower {
   background: @color-grey400;
@@ -65,11 +68,16 @@ input[type=range]:disabled::-ms-fill-lower {
 
 input[type=range]::-webkit-slider-thumb { .slider-thumb }
 input[type=range]::-moz-range-thumb { .slider-thumb }
-input[type=range]::-ms-thumb { .slider-thumb }
+input[type=range]::-ms-thumb {
+  .slider-thumb;
+  margin-top: -1px;
+}
 
 input[type=range]:disabled::-webkit-slider-thumb { .slider-thumb-disabled }
 input[type=range]:disabled::-moz-range-thumb { .slider-thumb-disabled }
-input[type=range]:disabled::-ms-thumb { .slider-thumb-disabled }
+input[type=range]:disabled::-ms-thumb {
+  .slider-thumb-disabled;
+}
 
 input[type=range]:focus {
   outline: none;
