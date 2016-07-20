@@ -14,10 +14,15 @@ This is an experimental project to share local videos with your friends via WebR
 ## Features
 
 - ### P2P Streaming
+
 	Video will be transfered via WebRTC. Only peers you connected to can access the video.
+
 - ### Progress Syncing
+
 	Operations will be applied to all when anyone plays / pauses / forwards / backwards the video.
+
 - ### Real-Time Communicating
+
 	You can comment anytime while watching.
 
 ## To Run
