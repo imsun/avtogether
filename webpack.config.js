@@ -70,4 +70,4 @@ module.exports = {
 		new webpack.NoErrorsPlugin(),
 		new ExtractTextPlugin("bundle.css", {allChunks: true})
 	]
-};
+}
