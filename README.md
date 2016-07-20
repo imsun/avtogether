@@ -54,6 +54,7 @@ This is an experimental project to share local videos with your friends via WebR
 	$ npm run build
 	$ http-server -p 8080
 	```
+
 ## Use Your Own Tracker
 
 By default **AvTogether** uses the following trackers:
