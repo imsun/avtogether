@@ -86,13 +86,13 @@ class Entry extends React.Component{
 						className="entry-button"
 						secondary={true}
 						onTouchTap={Room.create}
-						label="New Room"
+						label="Open Room"
 					/>
 					<RaisedButton
 						className="entry-button"
 						labelColor={cyan500}
 						onTouchTap={this.openJoinDialog}
-						label="Join a Room"
+						label="Join Room"
 					/>
 				</div>
 
@@ -128,11 +128,11 @@ class Entry extends React.Component{
 						<Paper className="card">
 							<SyncIcon />
 							<div className="card-title">Progress Syncing</div>
-							<div className="card-desc">Operation is applied to all when anyone plays / pauses / forwards / backwards the video</div>
+							<div className="card-desc">Operations will be applied to all when anyone plays / pauses / forwards / backwards the video</div>
 						</Paper>
 						<Paper className="card">
 							<ForumIcon />
-							<div className="card-title">Live Chat</div>
+							<div className="card-title">Real-Time Communicating</div>
 							<div className="card-desc">Comment anytime while watching</div>
 						</Paper>
 					</div>
