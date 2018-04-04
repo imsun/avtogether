@@ -15,11 +15,11 @@ This is an experimental project to share local videos with your friends via WebR
 
 - ### P2P Streaming
 
-	Video will be transfered via WebRTC. Only peers you connected to can access the video.
+	Videos will be transferred between peers via WebRTC. 
 
 - ### Progress Syncing
 
-	Operations will be applied to all when anyone plays / pauses / forwards / backwards the video.
+	Operations, such as plays / pauses / forwards / backwards, can be synchronized between clients simultaneously.
 
 - ### Real-Time Communicating
 
@@ -29,7 +29,7 @@ This is an experimental project to share local videos with your friends via WebR
 
 1. ### Create `src/config.js`
 	
-	**AvTogether** now is using [LeanCloud](https://leancloud.cn/) as the backend to save room information. So you need to create `src/config.js` to configure your LeanCloud as following:  
+	**AvTogether** uses [LeanCloud](https://leancloud.cn/) as the backend to save room information. To setup your own server, you may want to modify `src/config.js`:  
 
 	```js
 	export default {
@@ -42,13 +42,13 @@ This is an experimental project to share local videos with your friends via WebR
 	```
 1. ### Run it
 
-	Yout can run a dev server:
+	To run a dev server for debugging purpose:
 
 	```sh
 	$ npm run dev
 	```
 
-	Or build it and run an http server:
+	To run a production server:
 
 	```sh
 	$ npm run build
@@ -57,7 +57,7 @@ This is an experimental project to share local videos with your friends via WebR
 
 ## Use Your Own Tracker
 
-By default **AvTogether** uses the following trackers:
+A tracker is a special type of server which is used to assist in the communication between peers. By default **AvTogether** uses the following trackers:
 
 - udp://tracker.openbittorrent.com:80
 - udp://tracker.internetwarriors.net:1337
@@ -69,7 +69,7 @@ By default **AvTogether** uses the following trackers:
 - wss://tracker.openwebtorrent.com
 - wss://tracker.fastcast.nz
 
-But sometimes they are not accessiable, especially in China. You can run an [avtogether-tracker](https://github.com/imsun/avtogether-tracker) on your own server and add it to `src/config.js`:
+To add a custom tracker server you may modify the `src/config.js`:
 
 ```js
 export default {
@@ -80,6 +80,8 @@ export default {
 	}
 }
 ```
+
+You are able to run a tracker on your own server. Please refer to [avtogether-tracker](https://github.com/imsun/avtogether-tracker).
 
 ## License
 
